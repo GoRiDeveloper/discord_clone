@@ -2,7 +2,7 @@ import { GlobalProviders } from '@/providers';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Open_Sans } from 'next/font/google';
-import type { JSX, PropsWithChildren } from 'react';
+import type { FC, JSX, PropsWithChildren } from 'react';
 import './globals.css';
 
 /**
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
  *
  * @returns { JSX.Element } Main app component.
  */
-export default function RootLayout({
+const RootLayout: FC<PropsWithChildren> = ({
     children,
-}: PropsWithChildren): JSX.Element {
+}: PropsWithChildren): JSX.Element => {
     return (
         <ClerkProvider>
             <html lang="en">
@@ -34,4 +34,6 @@ export default function RootLayout({
             </html>
         </ClerkProvider>
     );
-}
+};
+
+export default RootLayout;
