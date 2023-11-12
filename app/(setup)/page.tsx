@@ -1,3 +1,4 @@
+import { InitialModal } from '@/components';
 import { db, initialProfile } from '@/lib';
 import { redirect } from 'next/navigation';
 import type { FC, JSX } from 'react';
@@ -24,7 +25,7 @@ const SetupPage: FC = async (): Promise<JSX.Element> => {
     // Check if any server exists, to redirect the user to that first instance server.
     if (server) return redirect(`/servers/${server.id}`);
 
-    return <> Setup Page </>;
+    return <InitialModal />;
 };
 
 export default SetupPage;
