@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 /**
  * Main app component.
  *
- * @param { PropsWithChildren } param0 -
+ * @param { PropsWithChildren } param0 - Default model of the properties of a component in React.
  *
  * @returns { JSX.Element } Main app component.
  */
@@ -27,7 +27,7 @@ const RootLayout: FC<PropsWithChildren> = ({
 }: PropsWithChildren): JSX.Element => {
     return (
         <ClerkProvider>
-            <html lang="en">
+            <html lang="en" suppressHydrationWarning>
                 <body className={font.className}>
                     <GlobalProviders>{children}</GlobalProviders>
                 </body>
