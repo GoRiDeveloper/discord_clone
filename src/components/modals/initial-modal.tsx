@@ -8,6 +8,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    FileUpload,
     Form,
     FormControl,
     FormField,
@@ -19,7 +20,9 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState, type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import * as z from 'zod';
+import axios from 'axios';
 
 /**
  * Server initial modal form schema reference.
@@ -40,6 +43,11 @@ type FormType = z.infer<typeof formSchema>;
  * @returns { JSX.Element | null } Initial server form modal.
  */
 export const InitialModal: FC = (): JSX.Element | null => {
+    /**
+     * App router.
+     */
+    const router = useRouter();
+
     // Status to check if the component is mounted.
     const [isMounted, setIsMounted] = useState(false);
 
@@ -69,10 +77,24 @@ export const InitialModal: FC = (): JSX.Element | null => {
      *
      * @param { FormType } values - Server form values.
      *
-     * @returns {} Functionality to submit server form.
+     * @returns { Promise<void> } Functionality to submit server form.
      */
-    const onSubmit = async (values: FormType) => {
-        console.log(values);
+    const onSubmit = async (values: FormType): Promise<void> => {
+        try {
+            // Function to create server in database.
+            await axios.post('/api/servers', values);
+
+            // Reset the form.
+            form.reset();
+
+            // Refresh the router.
+            router.refresh();
+
+            // Reload window page.
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     // If the component is not mounted, return null.
@@ -97,9 +119,23 @@ export const InitialModal: FC = (): JSX.Element | null => {
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-8"
                     >
-                        <div className="space-y-8 px-6">
+                        <div className="space-y-8 sm:px-6">
                             <div className="flex items-center justify-center text-center">
-                                TODO: Image Upload
+                                <FormField
+                                    control={form.control}
+                                    name="imageUrl"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <FileUpload
+                                                    endpoint="serverImage"
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                             <FormField
                                 control={form.control}

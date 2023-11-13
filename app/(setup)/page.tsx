@@ -1,8 +1,13 @@
-import { InitialModal } from '@/components';
+import { InitialModal } from '@/components/modals';
 import { db, initialProfile } from '@/lib';
 import { redirect } from 'next/navigation';
 import type { FC, JSX } from 'react';
 
+/**
+ * Setup page component.
+ *
+ * @returns { Promise<JSX.Element> } Setup page component.
+ */
 const SetupPage: FC = async (): Promise<JSX.Element> => {
     /**
      * Reference to obtain the user profile.
@@ -25,7 +30,11 @@ const SetupPage: FC = async (): Promise<JSX.Element> => {
     // Check if any server exists, to redirect the user to that first instance server.
     if (server) return redirect(`/servers/${server.id}`);
 
-    return <InitialModal />;
+    return (
+        <div className="max-w-full w-full h-full">
+            <InitialModal />
+        </div>
+    );
 };
 
 export default SetupPage;

@@ -1,1 +1,1 @@
-export * from "./initial-modal"
+export * from './initial-modal';

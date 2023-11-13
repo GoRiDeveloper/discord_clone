@@ -12,7 +12,13 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui';
 
-export function ModeToggle() {
+/**
+ * Theme button component.
+ *
+ * @returns { React.JSX.Element } Theme button component.
+ */
+export const ModeToggle: React.FC = (): React.JSX.Element => {
+    // Function to update theme.
     const { setTheme } = useTheme();
 
     return (
@@ -37,4 +43,4 @@ export function ModeToggle() {
             </DropdownMenuContent>
         </DropdownMenu>
     );
-}
+};

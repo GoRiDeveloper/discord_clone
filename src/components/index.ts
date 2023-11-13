@@ -1,3 +1,3 @@
-export * from './ui';
+export * from './file-upload';
 export * from './mode-toggle';
-export * from './modals';
+export * from './ui';
