@@ -4,3 +4,6 @@ export * from './label';
 export * from './input';
 export * from './form';
 export * from './dialog';
+export * from './separator';
+export * from './tooltip';
+export * from './scroll-area';

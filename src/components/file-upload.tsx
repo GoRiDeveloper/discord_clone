@@ -1,8 +1,9 @@
-import { UploadDropzone } from '@/lib';
 import '@uploadthing/react/styles.css';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import type { FC, JSX } from 'react';
+
+import { UploadDropzone } from '@/lib';
 
 /**
  * Properties for the file upload component.

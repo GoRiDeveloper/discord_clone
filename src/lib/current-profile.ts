@@ -1,9 +1,14 @@
 import { auth } from '@clerk/nextjs';
 import { db } from '@/lib';
 
+/**
+ * Function to get current profile.
+ *
+ * @returns Current profile.
+ */
 export const currentProfile = async () => {
     /**
-     * Reference to save the current user if it exists.
+     * The current user if it exists.
      */
     const { userId } = auth();
 
@@ -11,7 +16,7 @@ export const currentProfile = async () => {
     if (!userId) return null;
 
     /**
-     * Reference to save the found profile in the database.
+     * Profile in the database.
      */
     const profile = await db.profile.findUnique({
         where: {
