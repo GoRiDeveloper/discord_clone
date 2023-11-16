@@ -1,6 +1,10 @@
-import { ActionTooltip } from '@/components/action-tooltip';
+'use client';
+
 import { Plus } from 'lucide-react';
 import type { FC, JSX } from 'react';
+
+import { ActionTooltip } from '@/components/action-tooltip';
+import { useModal } from '@/hooks';
 
 /**
  * Navigation action component to add a new server.
@@ -8,10 +12,16 @@ import type { FC, JSX } from 'react';
  * @returns { JSX.Element } Navigation action component to add a new server.
  */
 export const NavigationAction: FC = (): JSX.Element => {
+    // Modal store functionalities.
+    const { onOpen } = useModal();
+
     return (
         <div>
             <ActionTooltip side="right" align="center" label="Add a server">
-                <button className="group flex items-center">
+                <button
+                    className="group flex items-center"
+                    onClick={() => onOpen('createServer')}
+                >
                     <div
                         className="
                             flex mx-3 h-[48px] w-[48px] rounded-[24px]

@@ -31,11 +31,17 @@ export const FileUpload: FC<FileUploadProps> = ({
      */
     const fileType = value?.split('.').pop();
 
-    // .
+    // Check if the file type is different from pdf.
     if (value && fileType !== 'pdf') {
         return (
             <div className="relative h-20 w-20">
-                <Image fill src={value} alt="upload" className="rounded-full" />
+                <Image
+                    fill
+                    src={value}
+                    sizes="80px"
+                    alt="upload"
+                    className="rounded-full"
+                />
                 <button
                     className="
                         bg-rose-500 text-white p-1 rounded-full absolute top-0

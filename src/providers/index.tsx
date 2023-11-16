@@ -1,5 +1,6 @@
 import type { FC, JSX, PropsWithChildren } from 'react';
 import { ThemeProvider } from './theme-provider';
+import { ModalProvider } from './modal-provider';
 
 /**
  * Global application providers.
@@ -18,6 +19,7 @@ export const GlobalProviders: FC<PropsWithChildren> = ({
             enableSystem={false}
             storageKey="discord-theme"
         >
+            <ModalProvider />
             {children}
         </ThemeProvider>
     );

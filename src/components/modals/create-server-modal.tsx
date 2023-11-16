@@ -1,11 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState, type FC, type JSX } from 'react';
-import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
-import * as z from 'zod';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import type { FC, JSX } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 import {
     Button,
@@ -24,9 +24,10 @@ import {
     FormMessage,
     Input,
 } from '@/components';
+import { useModal } from '@/hooks';
 
 /**
- * Server initial modal form schema reference.
+ * Create server modal form schema reference.
  */
 const formSchema = z.object({
     name: z.string().min(1, { message: 'Server name is required.' }),
@@ -39,23 +40,18 @@ const formSchema = z.object({
 type FormType = z.infer<typeof formSchema>;
 
 /**
- * Initial server form modal.
+ * Create server form modal.
  *
- * @returns { JSX.Element | null } Initial server form modal.
+ * @returns { JSX.Element | null } Create server form modal.
  */
-export const InitialModal: FC = (): JSX.Element | null => {
+export const CreateServerModal: FC = (): JSX.Element | null => {
+    // Modal store functionalities.
+    const { isOpen, onClose, type } = useModal();
+
     /**
      * App router.
      */
     const router = useRouter();
-
-    // Status to check if the component is mounted.
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        // Change the state of the component when it is mounted.
-        setIsMounted(true);
-    }, []);
 
     /**
      * Server form.
@@ -72,6 +68,11 @@ export const InitialModal: FC = (): JSX.Element | null => {
      * Form status being submitted.
      */
     const isLoading = form.formState.isSubmitting;
+
+    /**
+     * .
+     */
+    const isModalOpen = isOpen && type === 'createServer';
 
     /**
      * Function to submit server form.
@@ -91,18 +92,23 @@ export const InitialModal: FC = (): JSX.Element | null => {
             // Refresh the router.
             router.refresh();
 
-            // Reload window page.
-            window.location.reload();
+            // Close Modal function.
+            onClose();
         } catch (error) {
             console.error(error);
         }
     };
 
-    // If the component is not mounted, return null.
-    if (!isMounted) return null;
+    /**
+     * .
+     */
+    const handleClose = (): void => {
+        form.reset();
+        onClose();
+    };
 
     return (
-        <Dialog open>
+        <Dialog open={isModalOpen} onOpenChange={handleClose}>
             <DialogContent className="bg-white text-black p-0 overflow-hidden">
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center font-bold">
