@@ -16,7 +16,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<any>> {
         const { name, imageUrl } = await req.json();
 
         /**
-         * Save the reference of the current profile in session.
+         * The current profile in session.
          */
         const profile = await currentProfile();
 
