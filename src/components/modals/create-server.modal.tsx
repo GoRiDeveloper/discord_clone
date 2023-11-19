@@ -70,7 +70,7 @@ export const CreateServerModal: FC = (): JSX.Element | null => {
     const isLoading = form.formState.isSubmitting;
 
     /**
-     * .
+     * Check if the create server modal is open.
      */
     const isModalOpen = isOpen && type === 'createServer';
 
@@ -100,7 +100,7 @@ export const CreateServerModal: FC = (): JSX.Element | null => {
     };
 
     /**
-     * .
+     * Functionality to close the modal.
      */
     const handleClose = (): void => {
         form.reset();

@@ -18,7 +18,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components';
-import { ServerWithMembersWithProfiles } from '@/types';
+import type { ServerWithMembersWithProfiles } from '@/types';
+import { useModal } from '@/hooks';
 
 /**
  * Model for server header props component.
@@ -39,6 +40,9 @@ export const ServerHeader: FC<ServerHeaderProps> = ({
     server,
     role,
 }: ServerHeaderProps): JSX.Element => {
+    // Function to activate a modal.
+    const { onOpen } = useModal();
+
     /**
      * The profile is admin?.
      */
@@ -75,6 +79,7 @@ export const ServerHeader: FC<ServerHeaderProps> = ({
                             text-indigo-600 dark:text-indigo-400 px-3 py-2
                             text-sm cursor-pointer
                         "
+                        onClick={() => onOpen('invite', { server })}
                     >
                         {' '}
                         Invite People <UserPlus className="w-4 h-4 ml-auto" />
