@@ -1,17 +1,17 @@
 'use client';
 
 import axios from 'axios';
+import { Check, Copy, RefreshCw } from 'lucide-react';
 import { useState, type FC, type JSX } from 'react';
-import { Copy, RefreshCw, Check } from 'lucide-react';
 
 import {
+    Button,
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-    Label,
     Input,
-    Button,
+    Label,
 } from '@/components';
 import { useModal, useOrigin } from '@/hooks';
 

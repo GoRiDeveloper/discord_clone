@@ -8,9 +8,9 @@ import { randomUUID } from 'node:crypto';
  *
  * @param { NextRequest } req - Next Request.
  *
- * @returns { Promise<NextResponse<any>> } Response when uploading the server in the database.
+ * @returns { Promise<NextResponse> } Response when uploading the server in the database.
  */
-export async function POST(req: NextRequest): Promise<NextResponse<any>> {
+export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
         // Destructure the server information from the client.
         const { name, imageUrl } = await req.json();
