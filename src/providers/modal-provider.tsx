@@ -3,6 +3,7 @@
 import { useEffect, useState, type FC, type JSX } from 'react';
 
 import { InviteModal } from '@/components/modals/invite.modal';
+import { EditServerModal } from '@/components/modals/edit-server.modal';
 import { CreateServerModal } from '@/components/modals/create-server.modal';
 
 /**
@@ -25,6 +26,7 @@ export const ModalProvider: FC = (): JSX.Element | null => {
     return (
         <>
             <CreateServerModal />
+            <EditServerModal />
             <InviteModal />
         </>
     );

@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
 import { redirectToSignIn } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 import type { FC } from 'react';
 
 import { currentProfile, db } from '@/lib';
@@ -22,7 +22,7 @@ interface InviteCodePageProps {
  */
 const InviteCodePage: FC<InviteCodePageProps> = async ({
     params,
-}: InviteCodePageProps): Promise<null> => {
+}: InviteCodePageProps): Promise<null | never> => {
     /**
      * The current profile in session.
      */

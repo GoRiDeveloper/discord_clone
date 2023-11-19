@@ -4,7 +4,7 @@ import { create } from 'zustand';
 /**
  * Modal types.
  */
-export type ModalType = 'createServer' | 'invite';
+export type ModalType = 'createServer' | 'invite' | 'editServer';
 
 /**
  * Modal information.

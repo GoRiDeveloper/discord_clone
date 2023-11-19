@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import type { FC, JSX } from 'react';
+import { useEffect, type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -27,7 +27,7 @@ import {
 import { useModal } from '@/hooks';
 
 /**
- * Create server modal form schema reference.
+ * Edit server modal form schema reference.
  */
 const formSchema = z.object({
     name: z.string().min(1, { message: 'Server name is required.' }),
@@ -40,13 +40,13 @@ const formSchema = z.object({
 type FormType = z.infer<typeof formSchema>;
 
 /**
- * Create server form modal.
+ * Edit server form modal.
  *
- * @returns { JSX.Element | null } Create server form modal.
+ * @returns { JSX.Element | null } Edit server form modal.
  */
-export const CreateServerModal: FC = (): JSX.Element | null => {
+export const EditServerModal: FC = (): JSX.Element | null => {
     // Modal store functionalities.
-    const { isOpen, type, onClose } = useModal();
+    const { isOpen, type, data, onClose } = useModal();
 
     /**
      * App router.
@@ -65,14 +65,27 @@ export const CreateServerModal: FC = (): JSX.Element | null => {
     });
 
     /**
+     * Server information.
+     */
+    const { server } = data;
+
+    useEffect(() => {
+        // If the server exists, we complete the form with the server information.
+        if (server) {
+            form.setValue('name', server.name);
+            form.setValue('imageUrl', server.imageUrl);
+        }
+    }, [server, form]);
+
+    /**
      * Form status being submitted.
      */
     const isLoading = form.formState.isSubmitting;
 
     /**
-     * Check if the create server modal is open.
+     * Check if the edit server modal is open.
      */
-    const isModalOpen = isOpen && type === 'createServer';
+    const isModalOpen = isOpen && type === 'editServer';
 
     /**
      * Function to submit server form.
@@ -84,7 +97,7 @@ export const CreateServerModal: FC = (): JSX.Element | null => {
     const onSubmit = async (values: FormType): Promise<void> => {
         try {
             // Function to create server in database.
-            await axios.post('/api/servers', values);
+            await axios.patch(`/api/servers/${server?.id}`, values);
 
             // Reset the form.
             form.reset();
@@ -169,7 +182,7 @@ export const CreateServerModal: FC = (): JSX.Element | null => {
                         <DialogFooter className="bg-gray-100 px-6 py-4">
                             <Button variant="primary" disabled={isLoading}>
                                 {' '}
-                                Create{' '}
+                                Save{' '}
                             </Button>
                         </DialogFooter>
                     </form>

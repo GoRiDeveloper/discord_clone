@@ -16,9 +16,9 @@ import {
 import { useModal, useOrigin } from '@/hooks';
 
 /**
- * Create server form modal.
+ * Invite server modal.
  *
- * @returns { JSX.Element | null } Create server form modal.
+ * @returns { JSX.Element | null } Invite server modal.
  */
 export const InviteModal: FC = (): JSX.Element | null => {
     // Status for copied url.
