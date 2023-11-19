@@ -1,7 +1,8 @@
 'use client';
 
-import type { FC, JSX } from 'react';
-import { Copy, RefreshCw } from 'lucide-react';
+import axios from 'axios';
+import { useState, type FC, type JSX } from 'react';
+import { Copy, RefreshCw, Check } from 'lucide-react';
 
 import {
     Dialog,
@@ -12,7 +13,7 @@ import {
     Input,
     Button,
 } from '@/components';
-import { useModal } from '@/hooks';
+import { useModal, useOrigin } from '@/hooks';
 
 /**
  * Create server form modal.
@@ -20,13 +21,73 @@ import { useModal } from '@/hooks';
  * @returns { JSX.Element | null } Create server form modal.
  */
 export const InviteModal: FC = (): JSX.Element | null => {
+    // Status for copied url.
+    const [copied, setCopied] = useState(false);
+
+    // Loader state.
+    const [isLoading, setIsLoading] = useState(false);
+
     // Modal store functionalities.
-    const { isOpen, onClose, type } = useModal();
+    const { isOpen, type, data, onOpen, onClose } = useModal();
+
+    /**
+     * Url string origin.
+     */
+    const origin = useOrigin();
 
     /**
      * Check if the invitation modal is open.
      */
     const isModalOpen = isOpen && type === 'invite';
+
+    /**
+     * Server information.
+     */
+    const { server } = data;
+
+    /**
+     * Server invitation url.
+     */
+    const inviteUrl = `${origin}/invite/${server?.inviteCode}`;
+
+    /**
+     * Function to copy invitation code to server.
+     */
+    const onCopy = () => {
+        // Functionality to copy the invitation link to the system/device.
+        navigator.clipboard.writeText(inviteUrl);
+        // Change status, from url copy status, to copied
+        setCopied(true);
+
+        // Change status, from url copy status, to not copied, after 1 second.
+        setTimeout(() => {
+            setCopied(false);
+        }, 1000);
+    };
+
+    /**
+     * Function to generate a new invitation link.
+     */
+    const onRegenerate = async () => {
+        try {
+            // Change loader to true.
+            setIsLoading(true);
+
+            // Response to the request to generate a new invitation link.
+            const { data } = await axios.patch(
+                `/api/servers/${server?.id}/invite-code`
+            );
+
+            // Functionality to open the invitation modal.
+            onOpen('invite', { server: data });
+        } catch (error) {
+            // Mostramos el error en consola.
+            console.error({ error });
+        } finally {
+            // Change loader to false.
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -54,16 +115,23 @@ export const InviteModal: FC = (): JSX.Element | null => {
                                 text-black focus-visible:ring-offset-0
                                 border-0
                             "
-                            value="invite-link"
+                            disabled={isLoading}
+                            value={inviteUrl}
                         />
-                        <Button size="icon">
-                            <Copy className="w-4 h-4" />
+                        <Button
+                            size="icon"
+                            disabled={isLoading}
+                            onClick={onCopy}
+                        >
+                            {copied ? <Check /> : <Copy className="w-4 h-4" />}
                         </Button>
                     </div>
                     <Button
                         variant="link"
                         size="sm"
                         className="text-xs text-zinc-500 mt-4"
+                        disabled={isLoading}
+                        onClick={onRegenerate}
                     >
                         Generate a new link
                         <RefreshCw className="w-4 h-4 ml-2" />
