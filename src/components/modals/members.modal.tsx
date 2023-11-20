@@ -73,6 +73,13 @@ export const MembersModal: FC = (): JSX.Element | null => {
      */
     const { server } = data as { server: ServerWithMembersWithProfiles };
 
+    /**
+     * Function to ban a user from the server.
+     *
+     * @param { string } memberId - Member ID.
+     *
+     * @returns { Promise<void> } Functionality to ban a user from the server.
+     */
     const onKick = async (memberId: string): Promise<void> => {
         try {
             // Change of status to the user whose is being changed.
