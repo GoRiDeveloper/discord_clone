@@ -52,7 +52,7 @@ const roleIconMap = {
  * @returns { JSX.Element | null } Members modal.
  */
 export const MembersModal: FC = (): JSX.Element | null => {
-    // Status for role change to a user.
+    // Status for updating a user property.
     const [loadingId, setLoadingId] = useState('');
 
     // Modal store functionalities.
@@ -72,6 +72,37 @@ export const MembersModal: FC = (): JSX.Element | null => {
      * Server information.
      */
     const { server } = data as { server: ServerWithMembersWithProfiles };
+
+    const onKick = async (memberId: string): Promise<void> => {
+        try {
+            // Change of status to the user whose is being changed.
+            setLoadingId(memberId);
+
+            /**
+             * Url to cupdate a user's on the server.
+             */
+            const url = qs.stringify({
+                url: `/api/members/${memberId}`,
+                query: {
+                    serverId: server?.id,
+                },
+            });
+
+            // Server with user deleted.
+            const { data } = await axios.delete(url);
+
+            // Refresh current page.
+            router.refresh();
+
+            // Open updated member modal.
+            onOpen('members', { server: data });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            // User reset state updating.
+            setLoadingId('');
+        }
+    };
 
     /**
      * Function to change the user's role on the server.
@@ -109,7 +140,7 @@ export const MembersModal: FC = (): JSX.Element | null => {
         } catch (error) {
             console.error(error);
         } finally {
-            // Reset user role change status.
+            // User reset state updating.
             setLoadingId('');
         }
     };
@@ -191,7 +222,11 @@ export const MembersModal: FC = (): JSX.Element | null => {
                                                     </DropdownMenuPortal>
                                                 </DropdownMenuSub>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() =>
+                                                        onKick(member.id)
+                                                    }
+                                                >
                                                     <Gavel className="w-4 h-4 mr-2" />
                                                     Kick
                                                 </DropdownMenuItem>
