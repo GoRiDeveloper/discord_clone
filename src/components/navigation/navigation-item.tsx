@@ -1,10 +1,11 @@
 'use client';
 
-import { ActionTooltip } from '@/components/action-tooltip';
-import { cn } from '@/lib';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import type { FC, JSX } from 'react';
+
+import { ActionTooltip } from '@/components/action-tooltip';
+import { cn } from '@/lib';
 
 /**
  * Model for a navigation element component props.

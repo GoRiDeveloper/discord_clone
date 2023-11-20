@@ -4,3 +4,4 @@ export * from './mode-toggle';
 export * from './navigation';
 export * from './server';
 export * from './ui';
+export * from './user-avatar';

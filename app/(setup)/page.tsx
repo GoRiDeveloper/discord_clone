@@ -1,7 +1,8 @@
-import { InitialModal } from '@/components/modals/initial.modal';
-import { db, initialProfile } from '@/lib';
 import { redirect } from 'next/navigation';
 import type { FC, JSX } from 'react';
+
+import { InitialModal } from '@/components/modals/initial.modal';
+import { db, initialProfile } from '@/lib';
 
 /**
  * Setup page component.

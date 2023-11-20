@@ -2,9 +2,10 @@
 
 import { useEffect, useState, type FC, type JSX } from 'react';
 
-import { InviteModal } from '@/components/modals/invite.modal';
-import { EditServerModal } from '@/components/modals/edit-server.modal';
 import { CreateServerModal } from '@/components/modals/create-server.modal';
+import { EditServerModal } from '@/components/modals/edit-server.modal';
+import { InviteModal } from '@/components/modals/invite.modal';
+import { MembersModal } from '@/components/modals/members.modal';
 
 /**
  * Provider for application modals.
@@ -28,6 +29,7 @@ export const ModalProvider: FC = (): JSX.Element | null => {
             <CreateServerModal />
             <EditServerModal />
             <InviteModal />
+            <MembersModal />
         </>
     );
 };

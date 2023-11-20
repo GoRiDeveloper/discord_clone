@@ -3,12 +3,12 @@
 import { MemberRole } from '@prisma/client';
 import {
     ChevronDown,
+    LogOut,
+    PlusCircle,
     Settings,
+    Trash,
     UserPlus,
     Users,
-    PlusCircle,
-    Trash,
-    LogOut,
 } from 'lucide-react';
 import type { FC, JSX } from 'react';
 
@@ -18,8 +18,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components';
-import type { ServerWithMembersWithProfiles } from '@/types';
 import { useModal } from '@/hooks';
+import type { ServerWithMembersWithProfiles } from '@/types';
 
 /**
  * Model for server header props component.
@@ -95,7 +95,10 @@ export const ServerHeader: FC<ServerHeaderProps> = ({
                     </DropdownMenuItem>
                 )}
                 {isAdmin && (
-                    <DropdownMenuItem className="px-3 py-2 text-sm cursor-pointer">
+                    <DropdownMenuItem
+                        className="px-3 py-2 text-sm cursor-pointer"
+                        onClick={() => onOpen('members', { server })}
+                    >
                         {' '}
                         Manage Members <Users className="w-4 h-4 ml-auto" />
                     </DropdownMenuItem>

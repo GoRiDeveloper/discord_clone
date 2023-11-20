@@ -7,3 +7,4 @@ export * from './dialog';
 export * from './separator';
 export * from './tooltip';
 export * from './scroll-area';
+export * from './avatar';
