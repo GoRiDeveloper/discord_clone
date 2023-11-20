@@ -4,7 +4,12 @@ import { create } from 'zustand';
 /**
  * Modal types.
  */
-export type ModalType = 'createServer' | 'invite' | 'editServer' | 'members';
+export type ModalType =
+    | 'createServer'
+    | 'createChannel'
+    | 'invite'
+    | 'editServer'
+    | 'members';
 
 /**
  * Modal information.
