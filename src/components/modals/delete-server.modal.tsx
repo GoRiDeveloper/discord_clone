@@ -8,19 +8,19 @@ import {
     Button,
     Dialog,
     DialogContent,
-    DialogHeader,
-    DialogTitle,
     DialogDescription,
     DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components';
 import { useModal } from '@/hooks';
 
 /**
- * Leave server modal.
+ * Delete server modal.
  *
- * @returns { JSX.Element | null } Leave server modal.
+ * @returns { JSX.Element | null } Delete server modal.
  */
-export const LeaveServerModal: FC = (): JSX.Element | null => {
+export const DeleteServerModal: FC = (): JSX.Element | null => {
     // Loader state.
     const [isLoading, setIsLoading] = useState(false);
 
@@ -40,18 +40,18 @@ export const LeaveServerModal: FC = (): JSX.Element | null => {
     /**
      * Check if the invitation modal is open.
      */
-    const isModalOpen = isOpen && type === 'leaveServer';
+    const isModalOpen = isOpen && type === 'deleteServer';
 
     /**
-     * Function to exit the server.
+     * Function to delete the server.
      */
-    const onExit = async (): Promise<void> => {
+    const onDelete = async (): Promise<void> => {
         try {
-            // Change the state of the loader while the user leaves the server.
+            // Change the state of the loader while delete the server.
             setIsLoading(true);
 
-            // Request for the logged in user to exit the server.
-            await axios.patch(`/api/servers/${server?.id}/leave`);
+            // Request to delete the server.
+            await axios.delete(`/api/servers/${server?.id}`);
 
             // Close modal function.
             onClose();
@@ -64,7 +64,7 @@ export const LeaveServerModal: FC = (): JSX.Element | null => {
         } catch (error) {
             console.error(error);
         } finally {
-            // Change the state of the loader when the request to leave the server ends.
+            // Change the state of the loader when the request to delete the server ends.
             setIsLoading(false);
         }
     };
@@ -75,15 +75,15 @@ export const LeaveServerModal: FC = (): JSX.Element | null => {
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center font-bold">
                         {' '}
-                        Leave Server{' '}
+                        Delete Server{' '}
                     </DialogTitle>
                 </DialogHeader>
                 <DialogDescription className="text-center text-zinc-500">
-                    Are you sure you want to leave
+                    Are you sure you want do this?
+                    <br />
                     <span className="font-semibold text-indigo-500">
-                        {server?.name}
+                        {server?.name} will be permanently deleted.
                     </span>
-                    ?
                 </DialogDescription>
                 <DialogFooter className="bg-gray-100 px-6 py-4">
                     <div className="flex items-center justify-between w-full">
@@ -97,7 +97,7 @@ export const LeaveServerModal: FC = (): JSX.Element | null => {
                         <Button
                             variant="primary"
                             disabled={isLoading}
-                            onClick={onExit}
+                            onClick={onDelete}
                         >
                             Confirm
                         </Button>

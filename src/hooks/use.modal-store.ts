@@ -7,6 +7,7 @@ import { create } from 'zustand';
 export type ModalType =
     | 'createChannel'
     | 'createServer'
+    | 'deleteServer'
     | 'leaveServer'
     | 'editServer'
     | 'members'
