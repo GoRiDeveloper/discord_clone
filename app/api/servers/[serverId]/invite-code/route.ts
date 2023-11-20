@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { currentProfile, db } from '@/lib';
 
 /**
- * Patch parameters.
+ * Patch invite code parameters.
  */
 interface ParamsPatch {
     params: { serverId: string };
