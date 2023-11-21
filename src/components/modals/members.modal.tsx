@@ -41,9 +41,9 @@ import { ServerWithMembersWithProfiles } from '@/types';
  * Role icons.
  */
 const roleIconMap = {
-    GUEST: null,
-    MODERATOR: <ShieldCheck className="2-4 h-4 text-indigo-500" />,
-    ADMIN: <ShieldAlert className="w-4 h-4 text-rose-500" />,
+    [MemberRole.GUEST]: null,
+    [MemberRole.MODERATOR]: <ShieldCheck className="w-4 h-4 text-indigo-500" />,
+    [MemberRole.ADMIN]: <ShieldAlert className="w-4 h-4 text-rose-500" />,
 };
 
 /**

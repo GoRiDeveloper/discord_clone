@@ -9,3 +9,4 @@ export * from './tooltip';
 export * from './scroll-area';
 export * from './avatar';
 export * from './select';
+export * from './command';
