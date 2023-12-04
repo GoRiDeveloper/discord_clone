@@ -1,4 +1,4 @@
-import type { Server, Channel, ChannelType } from '@prisma/client';
+import type { Channel, ChannelType, Server } from '@prisma/client';
 import { create } from 'zustand';
 
 /**
