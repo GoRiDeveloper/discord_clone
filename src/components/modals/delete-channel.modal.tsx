@@ -1,5 +1,6 @@
 'use client';
 
+import qs from 'query-string';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState, type FC, type JSX } from 'react';
@@ -16,11 +17,11 @@ import {
 import { useModal } from '@/hooks';
 
 /**
- * Delete server modal.
+ * Delete channel modal.
  *
- * @returns { JSX.Element | null } Delete server modal.
+ * @returns { JSX.Element | null } Delete channel modal.
  */
-export const DeleteServerModal: FC = (): JSX.Element | null => {
+export const DeleteChannelModal: FC = (): JSX.Element | null => {
     // Loader state.
     const [isLoading, setIsLoading] = useState(false);
 
@@ -35,23 +36,33 @@ export const DeleteServerModal: FC = (): JSX.Element | null => {
     /**
      * Server information.
      */
-    const { server } = data;
+    const { server, channel } = data;
 
     /**
-     * Check if the delete server modal is open.
+     * Check if the delete channel modal is open.
      */
-    const isModalOpen = isOpen && type === 'deleteServer';
+    const isModalOpen = isOpen && type === 'deleteChannel';
 
     /**
-     * Function to delete the server.
+     * Function to delete channel on the server.
      */
     const onDelete = async (): Promise<void> => {
         try {
-            // Change the state of the loader while delete the server.
+            // Change the state of the loader while delete channel on the server.
             setIsLoading(true);
 
-            // Request to delete the server.
-            await axios.delete(`/api/servers/${server?.id}`);
+            /**
+             * Url to delete a channel on the server.
+             */
+            const url = qs.stringifyUrl({
+                url: `/api/channels/${channel?.id}`,
+                query: {
+                    serverId: server?.id,
+                },
+            });
+
+            // Request to delete channel on the server.
+            await axios.delete(url);
 
             // Close modal function.
             onClose();
@@ -59,8 +70,8 @@ export const DeleteServerModal: FC = (): JSX.Element | null => {
             // Refresh the router.
             router.refresh();
 
-            // Return to the main route of the application.
-            router.push('/');
+            // Return to the server id route of the application.
+            router.push(`/servers/${server?.id}`);
         } catch (error) {
             console.error(error);
         } finally {
@@ -75,14 +86,14 @@ export const DeleteServerModal: FC = (): JSX.Element | null => {
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center font-bold">
                         {' '}
-                        Delete Server{' '}
+                        Delete Channel{' '}
                     </DialogTitle>
                 </DialogHeader>
                 <DialogDescription className="text-center text-zinc-500">
                     Are you sure you want do this?
                     <br />
                     <span className="font-semibold text-indigo-500">
-                        {server?.name} will be permanently deleted.
+                        #{channel?.name} will be permanently deleted.
                     </span>
                 </DialogDescription>
                 <DialogFooter className="bg-gray-100 px-6 py-4">

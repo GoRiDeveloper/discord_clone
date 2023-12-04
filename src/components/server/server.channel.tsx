@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import type { FC, JSX } from 'react';
 
 import { cn } from '@/lib';
+import { useModal } from '@/hooks';
 import { ActionTooltip } from '@/components/action-tooltip';
 
 /**
@@ -38,6 +39,9 @@ export const ServerChannel: FC<ServerChannelProps> = ({
     server,
     role,
 }: ServerChannelProps): JSX.Element => {
+    // Modal store functionalities.
+    const { onOpen } = useModal();
+
     /**
      * App router.
      */
@@ -88,6 +92,9 @@ export const ServerChannel: FC<ServerChannelProps> = ({
                                 hidden group-hover:block w-4 h-4 text-zinc-500 hover:text-zinc-600
                                 dark:text-zinc-400dark:hover:text-zinc-300 transition
                             "
+                            onClick={() =>
+                                onOpen('deleteChannel', { server, channel })
+                            }
                         />
                     </ActionTooltip>
                 </div>
