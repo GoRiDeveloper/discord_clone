@@ -28,6 +28,7 @@ export const NavigationSidebar: FC = async (): Promise<JSX.Element> => {
             className="
                 space-y-4 flex flex-col items-center h-full
                 text-primary w-full dark:bg-[#1E1F22] py-3
+                bg-[#E3E5E8]
             "
         >
             <NavigationAction />

@@ -117,6 +117,7 @@ export const InviteModal: FC = (): JSX.Element | null => {
                             "
                             disabled={isLoading}
                             value={inviteUrl}
+                            readOnly
                         />
                         <Button
                             size="icon"

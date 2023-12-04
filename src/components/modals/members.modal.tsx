@@ -88,7 +88,7 @@ export const MembersModal: FC = (): JSX.Element | null => {
             /**
              * Url to cupdate a user's on the server.
              */
-            const url = qs.stringify({
+            const url = qs.stringifyUrl({
                 url: `/api/members/${memberId}`,
                 query: {
                     serverId: server?.id,

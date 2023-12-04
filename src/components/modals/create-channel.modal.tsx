@@ -114,7 +114,7 @@ export const CreateChannelModal: FC = (): JSX.Element | null => {
             /**
              * Url to create a channer on the server.
              */
-            const url = qs.stringify({
+            const url = qs.stringifyUrl({
                 url: '/api/channels',
                 query: {
                     serverId: params?.serverId,
