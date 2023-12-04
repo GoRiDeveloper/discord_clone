@@ -5,9 +5,9 @@ import { ChannelType } from '@prisma/client';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import qs from 'query-string';
-import type { FC, JSX } from 'react';
+import { useEffect, type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import z from 'zod';
 
 import {
     Button,
@@ -56,7 +56,7 @@ type FormType = z.infer<typeof formSchema>;
  */
 export const CreateChannelModal: FC = (): JSX.Element | null => {
     // Modal store functionalities.
-    const { isOpen, type, onClose } = useModal();
+    const { isOpen, type, data, onClose } = useModal();
 
     /**
      * App router.
@@ -78,6 +78,19 @@ export const CreateChannelModal: FC = (): JSX.Element | null => {
             type: ChannelType.TEXT,
         },
     });
+
+    // Unstructure channel type.
+    const { channelType } = data;
+
+    useEffect(() => {
+        // Verify the type of channel, if it does not exist,
+        // by default it will be a text channel in the form.
+        if (channelType) {
+            form.setValue('type', channelType);
+        } else {
+            form.setValue('type', ChannelType.TEXT);
+        }
+    }, [channelType, form]);
 
     /**
      * Form status being submitted.
