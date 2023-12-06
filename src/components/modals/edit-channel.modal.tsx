@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChannelType } from '@prisma/client';
 import axios from 'axios';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import { useEffect, type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
@@ -63,10 +63,8 @@ export const EditChannelModal: FC = (): JSX.Element | null => {
      */
     const router = useRouter();
 
-    /**
-     * Url page params.
-     */
-    const params = useParams();
+    // Unstructure channel type.
+    const { channel, server } = data;
 
     /**
      * Server form.
@@ -75,22 +73,17 @@ export const EditChannelModal: FC = (): JSX.Element | null => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
-            type: ChannelType.TEXT,
+            type: channel?.type || ChannelType.TEXT,
         },
     });
 
-    // Unstructure channel type.
-    const { channelType } = data;
-
     useEffect(() => {
-        // Verify the type of channel, if it does not exist,
-        // by default it will be a text channel in the form.
-        if (channelType) {
-            form.setValue('type', channelType);
-        } else {
-            form.setValue('type', ChannelType.TEXT);
+        // Check if there is channel information to set it in the editing form.
+        if (channel) {
+            form.setValue('name', channel.name);
+            form.setValue('type', channel.type);
         }
-    }, [channelType, form]);
+    }, [form, channel]);
 
     /**
      * Form status being submitted.
@@ -98,16 +91,16 @@ export const EditChannelModal: FC = (): JSX.Element | null => {
     const isLoading = form.formState.isSubmitting;
 
     /**
-     * Check if the create server modal is open.
+     * Check if the edit channel on the server modal is open.
      */
-    const isModalOpen = isOpen && type === 'createChannel';
+    const isModalOpen = isOpen && type === 'editChannel';
 
     /**
-     * Function to submit channel form.
+     * Function to submit edit channel form.
      *
      * @param { FormType } values - Channel form values.
      *
-     * @returns { Promise<void> } Functionality to submit channel form.
+     * @returns { Promise<void> } Functionality to submit edit channel form.
      */
     const onSubmit = async (values: FormType): Promise<void> => {
         try {
@@ -115,14 +108,14 @@ export const EditChannelModal: FC = (): JSX.Element | null => {
              * Url to create a channer on the server.
              */
             const url = qs.stringifyUrl({
-                url: '/api/channels',
+                url: `/api/channels/${channel?.id}`,
                 query: {
-                    serverId: params?.serverId,
+                    serverId: server?.id,
                 },
             });
 
-            // Function to create server in database.
-            await axios.post(url, values);
+            // Function to edit channel in database.
+            await axios.patch(url, values);
 
             // Reset the form.
             form.reset();
