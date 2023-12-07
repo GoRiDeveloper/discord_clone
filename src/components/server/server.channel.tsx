@@ -1,13 +1,13 @@
 'use client';
 
 import { Channel, ChannelType, MemberRole, Server } from '@prisma/client';
-import { Hash, Mic, Video, Edit, Trash, Lock } from 'lucide-react';
+import { Edit, Hash, Lock, Mic, Trash, Video } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import type { FC, JSX } from 'react';
+import type { FC, JSX, MouseEvent } from 'react';
 
-import { cn } from '@/lib';
-import { useModal } from '@/hooks';
 import { ActionTooltip } from '@/components/action-tooltip';
+import { useModal, type ModalType } from '@/hooks';
+import { cn } from '@/lib';
 
 /**
  * Model channel properties on server.
@@ -57,6 +57,24 @@ export const ServerChannel: FC<ServerChannelProps> = ({
      */
     const Icon = iconMap[channel.type];
 
+    /**
+     * Feature to redirect to a specific channel.
+     */
+    const onChannel = () => {
+        router.push(`/servers/${params?.serverId}/channels/${channel.id}`);
+    };
+
+    /**
+     * Function to trigger a specific modal.
+     *
+     * @param { MouseEvent<SVGSVGElement> } e - Event to trigger via svg.
+     * @param { ModalType } action - Type of modal to activate.
+     */
+    const onAction = (e: MouseEvent<SVGSVGElement>, action: ModalType) => {
+        e.stopPropagation();
+        onOpen(action, { channel, server });
+    };
+
     return (
         <button
             className={cn(
@@ -64,7 +82,7 @@ export const ServerChannel: FC<ServerChannelProps> = ({
                 params?.channelId === channel.id &&
                     'bg-zinc-700/20 dark:bg-zinc-700'
             )}
-            onClick={() => {}}
+            onClick={onChannel}
         >
             <Icon className="flex-shrink-0 w-5 h-5 text-zinc-500 dark:text-zinc-400" />
             <p
@@ -84,6 +102,7 @@ export const ServerChannel: FC<ServerChannelProps> = ({
                                 hidden group-hover:block w-4 h-4 text-zinc-500 hover:text-zinc-600
                                 dark:text-zinc-400dark:hover:text-zinc-300 transition
                             "
+                            onClick={(e) => onAction(e, 'editChannel')}
                         />
                     </ActionTooltip>
                     <ActionTooltip label="Trash">
@@ -92,9 +111,7 @@ export const ServerChannel: FC<ServerChannelProps> = ({
                                 hidden group-hover:block w-4 h-4 text-zinc-500 hover:text-zinc-600
                                 dark:text-zinc-400dark:hover:text-zinc-300 transition
                             "
-                            onClick={() =>
-                                onOpen('deleteChannel', { server, channel })
-                            }
+                            onClick={(e) => onAction(e, 'deleteChannel')}
                         />
                     </ActionTooltip>
                 </div>
