@@ -1,6 +1,6 @@
-import type { FC, JSX } from 'react';
-import { redirect } from 'next/navigation';
 import { redirectToSignIn } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
+import type { FC, JSX } from 'react';
 
 import { currentProfile, db } from '@/lib';
 

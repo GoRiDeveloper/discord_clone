@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
-import type { FC, PropsWithChildren, JSX } from 'react';
 import { redirectToSignIn } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
+import type { FC, JSX, PropsWithChildren } from 'react';
 
 import { ServerSidebar } from '@/components';
 import { currentProfile, db } from '@/lib';
@@ -50,10 +50,10 @@ const ServerIdLayout: FC<ServerIdLayoutProps> = async ({
 
     return (
         <div className="h-full">
-            <div className="hidden md:flex h-full w-60 z-20 flex-col inset-y-0">
+            <div className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
                 <ServerSidebar serverId={params.serverId} />
             </div>
-            <main className="h-dull md:pl-60">{children}</main>
+            <main className="h-full md:pl-60">{children}</main>
         </div>
     );
 };

@@ -43,7 +43,9 @@ export const ChatHeader: FC<ChatHeaderProps> = ({
             {type === 'conversation' && (
                 <UserAvatar className="w-8 h-8 md:h-8 mr-2" src={imageUrl} />
             )}
-            <p className="font-semibold text-md text-black dark">{name}</p>
+            <p className="font-semibold text-md text-black dark:text-white">
+                {name}
+            </p>
         </div>
     );
 };
