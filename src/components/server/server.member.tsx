@@ -51,6 +51,13 @@ export const ServerMember: FC<ServerMemberProps> = ({
      */
     const Icon = roleIconMap[member.role];
 
+    /**
+     * Function to redirect to a conversation with a specific member.
+     */
+    const onMember = () => {
+        router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
+    };
+
     return (
         <button
             className={cn(
@@ -58,6 +65,7 @@ export const ServerMember: FC<ServerMemberProps> = ({
                 params?.memberId === member.id &&
                     'bg-zinc-700/20 dark:bg-zinc-700'
             )}
+            onClick={onMember}
         >
             <UserAvatar
                 className="w-8 h-8 md:w-8 md:h-8"
