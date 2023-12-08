@@ -2,7 +2,7 @@ import type { FC, JSX } from 'react';
 import { redirectToSignIn } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-import { ChatHeader } from '@/components';
+import { ChatHeader, ChatInput } from '@/components';
 import { currentProfile, db } from '@/lib';
 
 /**
@@ -61,6 +61,16 @@ const ChannelIdPage: FC<ChannelIdPageProps> = async ({
                 serverId={serverId}
                 name={channel.name}
                 type={'channel'}
+            />
+            <div className="flex-1"></div>
+            <ChatInput
+                name={channel.name}
+                type="channel"
+                apiUrl="/api/socket/messages"
+                query={{
+                    channelId,
+                    serverId,
+                }}
             />
         </div>
     );
