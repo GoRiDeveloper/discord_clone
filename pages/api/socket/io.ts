@@ -10,10 +10,7 @@ export const config = {
     },
 };
 
-export const ioHandler = (
-    req: NextApiResponse,
-    res: NextApiResponseServerIo
-) => {
+const ioHandler = (req: NextApiResponse, res: NextApiResponseServerIo) => {
     if (!res.socket.server.io) {
         const path = '/api/socket/io';
         const httpServer: NetServer = res.socket.server as any;
@@ -26,3 +23,5 @@ export const ioHandler = (
     }
     res.end();
 };
+
+export default ioHandler;

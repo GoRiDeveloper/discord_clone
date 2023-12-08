@@ -1,7 +1,7 @@
 import { Hash } from 'lucide-react';
 import type { FC, JSX } from 'react';
 
-import { MobileToggle, UserAvatar } from '@/components';
+import { MobileToggle, SocketIndicator, UserAvatar } from '@/components';
 
 /**
  * Chat type model.
@@ -46,6 +46,9 @@ export const ChatHeader: FC<ChatHeaderProps> = ({
             <p className="font-semibold text-md text-black dark:text-white">
                 {name}
             </p>
+            <div className="ml-auto flex items-center">
+                <SocketIndicator />
+            </div>
         </div>
     );
 };

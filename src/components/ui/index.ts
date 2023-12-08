@@ -11,3 +11,4 @@ export * from './select';
 export * from './separator';
 export * from './sheet';
 export * from './tooltip';
+export * from './badge';
