@@ -1,11 +1,12 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import qs from 'query-string';
 import { type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import * as z from 'zod';
-import axios from 'axios';
 
 import {
     Button,
@@ -20,18 +21,14 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
-    FormMessage,
-    Input,
 } from '@/components';
 import { useModal } from '@/hooks';
 
 /**
- * Server initial modal form schema reference.
+ * Message file modal form schema reference.
  */
 const formSchema = z.object({
-    name: z.string().min(1, { message: 'Server name is required.' }),
-    imageUrl: z.string().min(1, { message: 'Server image is required.' }),
+    fileUrl: z.string().min(1, { message: 'Attachment is required.' }),
 });
 
 /**
@@ -45,6 +42,7 @@ type FormType = z.infer<typeof formSchema>;
  * @returns { JSX.Element | null } Initial server form modal.
  */
 export const MessageFileModal: FC = (): JSX.Element | null => {
+    // Modal functionalities.
     const { isOpen, type, data, onClose } = useModal();
     /**
      * App router.
@@ -57,10 +55,12 @@ export const MessageFileModal: FC = (): JSX.Element | null => {
     const form = useForm<FormType>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: '',
-            imageUrl: '',
+            fileUrl: '',
         },
     });
+
+    // Destructure the query and the api url of the modal information.
+    const { apiUrl, query } = data;
 
     /**
      * Check if the message file modal is open.
@@ -81,16 +81,27 @@ export const MessageFileModal: FC = (): JSX.Element | null => {
     };
 
     /**
-     * Function to submit server form.
+     * Function to submit a message file form.
      *
-     * @param { FormType } values - Server form values.
+     * @param { FormType } values - Message file form values.
      *
-     * @returns { Promise<void> } Functionality to submit server form.
+     * @returns { Promise<void> } Functionality to submit message file form.
      */
     const onSubmit = async (values: FormType): Promise<void> => {
         try {
-            // Function to create server in database.
-            await axios.post('/api/servers', values);
+            /**
+             * Url to send a message file.
+             */
+            const url = qs.stringifyUrl({
+                url: apiUrl || '',
+                query,
+            });
+
+            // Function to send a message.
+            await axios.post(url, {
+                ...values,
+                content: values.fileUrl,
+            });
 
             // Reset the form.
             form.reset();
@@ -98,8 +109,8 @@ export const MessageFileModal: FC = (): JSX.Element | null => {
             // Refresh the router.
             router.refresh();
 
-            // Reload window page.
-            window.location.reload();
+            // Close modal.
+            onCloseModal();
         } catch (error) {
             console.error(error);
         }
@@ -111,12 +122,11 @@ export const MessageFileModal: FC = (): JSX.Element | null => {
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center font-bold">
                         {' '}
-                        Customize your{' '}
+                        Add an attachment{' '}
                     </DialogTitle>
                     <DialogDescription>
                         {' '}
-                        Give your server a personality with a name and an image.
-                        You can always change it later{' '}
+                        Send a file as a message{' '}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -128,12 +138,12 @@ export const MessageFileModal: FC = (): JSX.Element | null => {
                             <div className="flex items-center justify-center text-center">
                                 <FormField
                                     control={form.control}
-                                    name="imageUrl"
+                                    name="fileUrl"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
                                                 <FileUpload
-                                                    endpoint="serverImage"
+                                                    endpoint="messageFile"
                                                     value={field.value}
                                                     onChange={field.onChange}
                                                 />
@@ -142,32 +152,11 @@ export const MessageFileModal: FC = (): JSX.Element | null => {
                                     )}
                                 />
                             </div>
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
-                                            {' '}
-                                            Server name{' '}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                                                placeholder="Enter server name"
-                                                disabled={isLoading}
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                         </div>
                         <DialogFooter className="bg-gray-100 px-6 py-4">
                             <Button variant="primary" disabled={isLoading}>
                                 {' '}
-                                Create{' '}
+                                Send{' '}
                             </Button>
                         </DialogFooter>
                     </form>
