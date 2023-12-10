@@ -2,13 +2,21 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { Plus, Smile } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import qs from 'query-string';
 import type { FC, JSX } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { useRouter } from 'next/navigation';
 
-import { Form, FormControl, FormField, FormItem, Input } from '@/components';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    Input,
+    EmojiPicker,
+} from '@/components';
 import { useModal } from '@/hooks';
 
 /**
@@ -46,6 +54,11 @@ export const ChatInput: FC<ChatInputProps> = ({
     name,
     type,
 }: ChatInputProps): JSX.Element => {
+    /**
+     * App router.
+     */
+    const router = useRouter();
+
     // Modal store functionalities.
     const { onOpen } = useModal();
 
@@ -86,6 +99,12 @@ export const ChatInput: FC<ChatInputProps> = ({
 
             // Message sending request.
             await axios.post(url, values);
+
+            // Reset the form.
+            form.reset();
+
+            // Refresh the router.
+            router.refresh();
         } catch (error) {
             console.error({ error });
         }
@@ -129,7 +148,13 @@ export const ChatInput: FC<ChatInputProps> = ({
                                         {...field}
                                     />
                                     <div className="absolute top-7 right-8">
-                                        <Smile />
+                                        <EmojiPicker
+                                            onChange={(emoji: string) =>
+                                                field.onChange(
+                                                    `${field.value} ${emoji}`
+                                                )
+                                            }
+                                        />
                                     </div>
                                 </div>
                             </FormControl>
