@@ -37,13 +37,14 @@ const formSchema = z.object({
 type FormType = z.infer<typeof formSchema>;
 
 /**
- * Initial server form modal.
+ * Message file form modal.
  *
  * @returns { JSX.Element | null } Initial server form modal.
  */
 export const MessageFileModal: FC = (): JSX.Element | null => {
     // Modal functionalities.
     const { isOpen, type, data, onClose } = useModal();
+
     /**
      * App router.
      */
