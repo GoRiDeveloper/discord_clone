@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import z from 'zod';
 
 import { Form, FormControl, FormField, FormItem, Input } from '@/components';
+import { useModal } from '@/hooks';
 
 /**
  * Model of the properties of the Chat Input component.
@@ -45,6 +46,9 @@ export const ChatInput: FC<ChatInputProps> = ({
     name,
     type,
 }: ChatInputProps): JSX.Element => {
+    // Modal store functionalities.
+    const { onOpen } = useModal();
+
     /**
      * Chat form.
      */
@@ -104,7 +108,12 @@ export const ChatInput: FC<ChatInputProps> = ({
                                             transition rounded-full p-1 items-center justify-center
                                         "
                                         type="button"
-                                        onClick={() => {}}
+                                        onClick={() =>
+                                            onOpen('messageFile', {
+                                                apiUrl,
+                                                query,
+                                            })
+                                        }
                                     >
                                         <Plus className="text-white dark:text-[#313338]" />
                                     </button>
