@@ -3,6 +3,7 @@ import type { FC, JSX, PropsWithChildren } from 'react';
 import { ModalProvider } from './modal-provider';
 import { SocketProvider } from './socket.provider';
 import { ThemeProvider } from './theme-provider';
+import { QueryProvider } from './query.provider';
 
 /**
  * Global application providers.
@@ -22,7 +23,9 @@ export const GlobalProviders: FC<PropsWithChildren> = ({
             storageKey="discord-theme"
         >
             <ModalProvider />
-            <SocketProvider>{children}</SocketProvider>
+            <SocketProvider>
+                <QueryProvider>{children}</QueryProvider>
+            </SocketProvider>
         </ThemeProvider>
     );
 };
