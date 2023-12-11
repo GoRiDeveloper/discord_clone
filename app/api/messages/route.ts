@@ -1,0 +1,111 @@
+import { Message } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { currentProfile, db } from '@/lib';
+
+/**
+ * Messages batch.
+ */
+const MESSAGES_BATCH = 10;
+
+/**
+ * Function to find messages in the database.
+ *
+ * @param { NextRequest } req - Next request.
+ *
+ * @returns { Promise<NextResponse> } Found messages.
+ */
+export async function GET(req: NextRequest): Promise<NextResponse> {
+    try {
+        /**
+         * The current profile in session.
+         */
+        const profile = await currentProfile();
+
+        // Search parameters in the url.
+        const { searchParams } = new URL(req.url);
+
+        /**
+         * Cursor param.
+         */
+        const cursor = searchParams.get('cursor');
+
+        /**
+         * .
+         */
+        const channelId = searchParams.get('channelId');
+
+        // If there is no profile in session, return a non-authorization response.
+        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
+
+        // In case the channel id does not exist, respond that the channel id does not exist.
+        if (!channelId)
+            return new NextResponse('Channel ID missing', { status: 400 });
+
+        /**
+         * Variable to store the messages found in the database.
+         */
+        let messages: Message[] = [];
+
+        // If there is a cursor, we search for messages from a specific channel with
+        // that cursor, if not, we search for messages from a specific channel.
+        if (cursor) {
+            messages = await db.message.findMany({
+                take: MESSAGES_BATCH,
+                skip: 1,
+                cursor: {
+                    id: cursor,
+                },
+                where: {
+                    channelId,
+                },
+                include: {
+                    member: {
+                        include: {
+                            profile: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+            });
+        } else {
+            messages = await db.message.findMany({
+                take: MESSAGES_BATCH,
+                where: {
+                    channelId,
+                },
+                include: {
+                    member: {
+                        include: {
+                            profile: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+            });
+        }
+
+        /**
+         * Variable to save the next message cursor.
+         */
+        let nextCursor = null;
+
+        // If the messages exceed the allowed batch, configure the next cursor.
+        if (messages.length === MESSAGES_BATCH)
+            nextCursor = messages[MESSAGES_BATCH - 1].id;
+
+        // Return the messages found and the next cursor.
+        return NextResponse.json({
+            items: messages,
+            nextCursor,
+        });
+    } catch (error) {
+        console.log('[MESSAGES_GET]', error);
+        // Return an error response if there is an error.
+        return new NextResponse('Internal Error', { status: 500 });
+    }
+}
