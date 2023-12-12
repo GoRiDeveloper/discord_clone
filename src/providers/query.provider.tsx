@@ -1,5 +1,7 @@
-import { useState, type FC, type PropsWithChildren, type JSX } from 'react';
+'use client';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState, type FC, type JSX, type PropsWithChildren } from 'react';
 
 /**
  * React query provider.

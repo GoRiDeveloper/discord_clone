@@ -2,19 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Member, MemberRole } from '@prisma/client';
-import {
-    Edit,
-    FileIcon,
-    ShieldAlert,
-    ShieldCheck,
-    Trash,
-    X,
-} from 'lucide-react';
+import axios from 'axios';
+import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash } from 'lucide-react';
 import Image from 'next/image';
+import qs from 'query-string';
 import { useEffect, useState, type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import qs from 'query-string';
 import z from 'zod';
 
 import {
@@ -28,6 +21,7 @@ import {
 } from '@/components';
 import { ActionTooltip } from '@/components/action-tooltip';
 import type { MemberWithProfile } from '@/components/chat/model';
+import { useModal } from '@/hooks';
 import { cn } from '@/lib';
 
 /**
@@ -83,11 +77,11 @@ export const ChatItem: FC<ChatItemProps> = ({
     member,
     socketQuery,
 }: ChatItemProps): JSX.Element => {
+    // Modal store functionalities.
+    const { onOpen } = useModal();
+
     // Editing state.
     const [isEditing, setIsEditing] = useState(false);
-
-    // Delet ing state.
-    const [isDeleting, setIsDeleting] = useState(false);
 
     /**
      * Chat form schema type.
