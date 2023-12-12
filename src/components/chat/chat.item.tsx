@@ -182,7 +182,7 @@ export const ChatItem: FC<ChatItemProps> = ({
      *
      * @param { ChatType } values - Chat form values.
      */
-    const onSubmit = async (values: ChatType) => {
+    const onSubmit = async (values: ChatType): Promise<void> => {
         try {
             /**
              * Url to edit message.
@@ -197,6 +197,9 @@ export const ChatItem: FC<ChatItemProps> = ({
 
             // Reset form.
             form.reset();
+
+            // Change editing state.
+            setIsEditing(false);
         } catch (error) {
             console.error(error);
         }
