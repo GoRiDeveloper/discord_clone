@@ -1,10 +1,26 @@
+'use client';
+
 import type { FC, JSX } from 'react';
-import { Member } from '@prisma/client';
+import { format } from 'date-fns';
+import { Member, Message } from '@prisma/client';
 import { useParams } from 'next/navigation';
 import { Loader2, ServerCrash } from 'lucide-react';
 
-import { ChatWelcome } from '@/components';
+import type { MemberWithProfile } from '@/components/chat/model';
+import { ChatWelcome, ChatItem } from '@/components';
 import { useChatQuery } from '@/hooks';
+
+/**
+ * Date format.
+ */
+const DATE_FORMAT = 'd MMM yyyy, HH:mm';
+
+/**
+ * Model for message with member with profile props.
+ */
+type MessageWithMemberWithProfile = Message & {
+    member: MemberWithProfile;
+};
 
 /**
  * Model for chat messages props.
@@ -83,6 +99,34 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
         <div className="flex-1 flex flex-col py-4 overflow-y-auto">
             <div className="flex-1" />
             <ChatWelcome type={type} name={name} />
+            <div className="flex flex-col-reverse mt-auto">
+                {data?.pages?.map((group, i) => (
+                    <div key={i}>
+                        {group.items.map(
+                            (message: MessageWithMemberWithProfile) => (
+                                <ChatItem
+                                    key={message.id}
+                                    id={message.id}
+                                    member={message.member}
+                                    content={message.content}
+                                    fileUrl={message.fileUrl}
+                                    deleted={message.deleted}
+                                    currentMember={member}
+                                    socketUrl={socketUrl}
+                                    socketQuery={socketQuery}
+                                    isUpdated={
+                                        message.updatedAt !== message.createdAt
+                                    }
+                                    timestamp={format(
+                                        new Date(message.createdAt),
+                                        DATE_FORMAT
+                                    )}
+                                />
+                            )
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
