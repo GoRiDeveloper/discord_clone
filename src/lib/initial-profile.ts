@@ -13,7 +13,10 @@ export const initialProfile = async (): Promise<any> => {
     const user = await currentUser();
 
     // Check if the user exists, if not, redirect the user to authenticate.
-    if (!user) return redirectToSignIn();
+    if (!user)
+        return redirectToSignIn({
+            returnBackUrl: 'http://localhost:3000/',
+        });
 
     /**
      * Reference to save the found user in the database.

@@ -335,6 +335,12 @@ export const ChatItem: FC<ChatItemProps> = ({
                                 hover:text-zinc-600 dark:hover:text-zinc-300
                                 transition
                             "
+                            onClick={() =>
+                                onOpen('deleteMessage', {
+                                    apiUrl: `${socketUrl}/${id}`,
+                                    query: socketQuery,
+                                })
+                            }
                         />
                     </ActionTooltip>
                 </div>

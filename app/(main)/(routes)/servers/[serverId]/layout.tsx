@@ -29,7 +29,10 @@ const ServerIdLayout: FC<ServerIdLayoutProps> = async ({
     const profile = await currentProfile();
 
     // If there is no profile in session, return a non-authorization response.
-    if (!profile) return redirectToSignIn();
+    if (!profile)
+        return redirectToSignIn({
+            returnBackUrl: 'http://localhost:3000/',
+        });
 
     /**
      * Server found.

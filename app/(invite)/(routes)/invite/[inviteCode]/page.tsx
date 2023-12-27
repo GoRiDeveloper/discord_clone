@@ -29,7 +29,10 @@ const InviteCodePage: FC<InviteCodePageProps> = async ({
     const profile = await currentProfile();
 
     // Check if the profile exists, if not, redirect to authenticate.
-    if (!profile) return redirectToSignIn();
+    if (!profile)
+        return redirectToSignIn({
+            returnBackUrl: 'http://localhost:3000/',
+        });
 
     // If there is no server id, redirect to main page.
     if (!params.inviteCode) return redirect('/');
