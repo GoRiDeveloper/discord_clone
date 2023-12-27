@@ -1,7 +1,6 @@
 'use client';
 
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import { useState, type FC, type JSX } from 'react';
 
@@ -29,14 +28,9 @@ export const DeleteMessageModal: FC = (): JSX.Element | null => {
     const { isOpen, type, data, onClose } = useModal();
 
     /**
-     * App router.
-     */
-    const router = useRouter();
-
-    /**
      * Server information.
      */
-    const { server, channel } = data;
+    const { apiUrl, query } = data;
 
     /**
      * Check if the delete channel modal is open.
@@ -55,23 +49,15 @@ export const DeleteMessageModal: FC = (): JSX.Element | null => {
              * Url to delete a channel on the server.
              */
             const url = qs.stringifyUrl({
-                url: `/api/channels/${channel?.id}`,
-                query: {
-                    serverId: server?.id,
-                },
+                url: apiUrl || '',
+                query,
             });
 
-            // Request to delete channel on the server.
+            // Request to delete message on the channel.
             await axios.delete(url);
 
             // Close modal function.
             onClose();
-
-            // Refresh the router.
-            router.refresh();
-
-            // Return to the server id route of the application.
-            router.push(`/servers/${server?.id}`);
         } catch (error) {
             console.error(error);
         } finally {
@@ -86,15 +72,13 @@ export const DeleteMessageModal: FC = (): JSX.Element | null => {
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center font-bold">
                         {' '}
-                        Delete Channel{' '}
+                        Delete Message{' '}
                     </DialogTitle>
                 </DialogHeader>
                 <DialogDescription className="text-center text-zinc-500">
                     Are you sure you want do this?
                     <br />
-                    <span className="font-semibold text-indigo-500">
-                        #{channel?.name} will be permanently deleted.
-                    </span>
+                    The message will be permanently deletes.
                 </DialogDescription>
                 <DialogFooter className="bg-gray-100 px-6 py-4">
                     <div className="flex items-center justify-between w-full">
