@@ -5,6 +5,7 @@ import { Member, MemberRole } from '@prisma/client';
 import axios from 'axios';
 import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash } from 'lucide-react';
 import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
 import qs from 'query-string';
 import { useEffect, useState, type FC, type JSX } from 'react';
 import { useForm } from 'react-hook-form';
@@ -87,6 +88,16 @@ export const ChatItem: FC<ChatItemProps> = ({
      * Chat form schema type.
      */
     type ChatType = z.infer<typeof formSchema>;
+
+    /**
+     * App router.
+     */
+    const router = useRouter();
+
+    /**
+     * Url page params.
+     */
+    const params = useParams();
 
     /**
      * Chat form.
@@ -172,6 +183,18 @@ export const ChatItem: FC<ChatItemProps> = ({
     const isImage = !isPDF && fileUrl;
 
     /**
+     * Function to handle the click of a member on the server.
+     *
+     * @returns { void } Functionality to handle a member click on the server.
+     */
+    const onMemberClick = () => {
+        // If the clicked member is the current member, we exit the function.
+        if (member.id === currentMember.id) return;
+        // Return the application to the chat section of the clicked member.
+        router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
+    };
+
+    /**
      * Function to handle message editing.
      *
      * @param { ChatType } values - Chat form values.
@@ -202,15 +225,21 @@ export const ChatItem: FC<ChatItemProps> = ({
     return (
         <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
             <div className="group flex gap-x-2 items-start w-full">
-                <div className="cursor-pointer hover:drop-shadow-md transition">
+                <button
+                    className="cursor-pointer hover:drop-shadow-md transition"
+                    onClick={onMemberClick}
+                >
                     <UserAvatar src={member.profile.imageUrl} />
-                </div>
+                </button>
                 <div className="flex flex-col w-full">
                     <div className="flex items-center gap-x-2">
                         <div className="flex items-center">
-                            <p className="font-semibold text-sm hoverunderline cursor-pointer">
+                            <button
+                                className="font-semibold text-sm hoverunderline cursor-pointer"
+                                onClick={onMemberClick}
+                            >
                                 {member.profile.name}
-                            </p>
+                            </button>
                             <ActionTooltip label={member.role}>
                                 {roleIconMap[member.role]}
                             </ActionTooltip>
