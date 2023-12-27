@@ -1,10 +1,16 @@
-import type { FC, JSX } from 'react';
+'use client';
+
+import EmojiData from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
 import { Smile } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import Picker from '@emoji-mart/react';
-import EmojiData from '@emoji-mart/data';
+import type { FC, JSX } from 'react';
 
-import { Popover, PopoverTrigger, PopoverContent } from '@/components';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 
 /**
  * Model for emoji picker component.
@@ -37,14 +43,15 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({
                 />
             </PopoverTrigger>
             <PopoverContent
-                className="bg.transparent border-none shadow-none drop-shadow-none mb-16"
+                className="bg-transparent border-none shadow-none drop-shadow-none mb-16"
                 side="right"
-                sideOffset={40}
+                sideOffset={-20}
             >
                 <Picker
                     theme={resolvedTheme}
                     data={EmojiData}
                     onEmojiSelect={(emoji: any) => onChange(emoji.native)}
+                    emojiButtonSize={28}
                 />
             </PopoverContent>
         </Popover>

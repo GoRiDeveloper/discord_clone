@@ -1,6 +1,5 @@
 export * from './action-tooltip.label';
 export * from './chat';
-export * from './emoji-picker';
 export * from './file-upload';
 export * from './mobile.toggle';
 export * from './mode-toggle';

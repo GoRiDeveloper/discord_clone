@@ -3,20 +3,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import type { FC, JSX } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
-import { useRouter } from 'next/navigation';
 
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    Input,
-    EmojiPicker,
-} from '@/components';
+import { EmojiPicker } from '@/components/emoji-picker';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { useModal } from '@/hooks';
 
 /**

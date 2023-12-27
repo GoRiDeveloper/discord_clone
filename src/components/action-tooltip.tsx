@@ -2,13 +2,13 @@
 
 import type { FC, JSX, PropsWithChildren } from 'react';
 
+import { ActionTooltipLabel } from '@/components';
 import {
-    ActionTooltipLabel,
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@/components';
+} from '@/components/ui/tooltip';
 
 /**
  * Model for action tooltip component.

@@ -11,7 +11,7 @@ import {
     CommandEmpty,
     CommandItem,
     CommandGroup,
-} from '@/components';
+} from '@/components/ui/command';
 
 /**
  * Typed for search types

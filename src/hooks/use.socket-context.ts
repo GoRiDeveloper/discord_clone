@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
-import { SocketContext, type ISocketContext } from '@/context';
+import { SocketContext } from '@/context/socket.context';
+import type { ISocketContext } from '@/context';
 
 /**
  * Hook to use sockets context.

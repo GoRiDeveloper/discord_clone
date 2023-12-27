@@ -7,7 +7,8 @@ import { useParams } from 'next/navigation';
 import { Loader2, ServerCrash } from 'lucide-react';
 
 import type { MemberWithProfile } from '@/components/chat/model';
-import { ChatWelcome, ChatItem } from '@/components';
+import { ChatWelcome } from '@/components/chat/chat.welcome';
+import { ChatItem } from '@/components/chat/chat.item';
 import { useChatQuery } from '@/hooks';
 
 /**
