@@ -2,26 +2,19 @@
 
 import type { FC, JSX } from 'react';
 import { format } from 'date-fns';
-import { Member, Message } from '@prisma/client';
+import { Member } from '@prisma/client';
 import { useParams } from 'next/navigation';
 import { Loader2, ServerCrash } from 'lucide-react';
 
-import type { MemberWithProfile } from '@/components/chat/model';
 import { ChatWelcome } from '@/components/chat/chat.welcome';
 import { ChatItem } from '@/components/chat/chat.item';
 import { useChatQuery } from '@/hooks';
+import type { MessageWithMemberWithProfile } from '@/models';
 
 /**
  * Date format.
  */
 const DATE_FORMAT = 'd MMM yyyy, HH:mm';
-
-/**
- * Model for message with member with profile props.
- */
-type MessageWithMemberWithProfile = Message & {
-    member: MemberWithProfile;
-};
 
 /**
  * Model for chat messages props.
