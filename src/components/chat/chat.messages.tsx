@@ -8,7 +8,7 @@ import { Loader2, ServerCrash } from 'lucide-react';
 
 import { ChatWelcome } from '@/components/chat/chat.welcome';
 import { ChatItem } from '@/components/chat/chat.item';
-import { useChatQuery, useChatSocket } from '@/hooks';
+import { useChatQuery, useChatSocket, useChatScroll } from '@/hooks';
 import type { MessageWithMemberWithProfile } from '@/models';
 
 /**
@@ -75,10 +75,19 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
         queryKey: `chat:${chatId}:messages:update`,
     });
 
+    // Hook to manage the scroll chat.
+    useChatScroll({
+        chatRef,
+        bottomRef,
+        shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+        count: data?.pages?.[0]?.items?.length ?? 0,
+        loadMore: fetchNextPage,
+    });
+
     /**
      * Url page params.
      */
-    const params = useParams();
+    //const params = useParams();
 
     // If status is pending, return a load component.
     if (status === 'pending') {
