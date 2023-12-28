@@ -21,9 +21,9 @@ import {
     UserAvatar,
 } from '@/components';
 import { ActionTooltip } from '@/components/action-tooltip';
-import type { MemberWithProfile } from '@/components/chat/model';
 import { useModal } from '@/hooks';
 import { cn } from '@/lib';
+import type { MemberWithProfile } from '@/models';
 
 /**
  * Model for chat items props.
