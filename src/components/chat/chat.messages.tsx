@@ -8,7 +8,7 @@ import { Loader2, ServerCrash } from 'lucide-react';
 
 import { ChatWelcome } from '@/components/chat/chat.welcome';
 import { ChatItem } from '@/components/chat/chat.item';
-import { useChatQuery } from '@/hooks';
+import { useChatQuery, useChatSocket } from '@/hooks';
 import type { MessageWithMemberWithProfile } from '@/models';
 
 /**
@@ -57,6 +57,13 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
             paramKey,
             paramValue,
         });
+
+    // Hook to manage the chat socket.
+    useChatSocket({
+        addKey: `chat:${chatId}`,
+        updateKey: `chat:${chatId}:messages`,
+        queryKey: `chat:${chatId}:messages:update`,
+    });
 
     /**
      * Url page params.
