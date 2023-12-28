@@ -1,6 +1,6 @@
 'use client';
 
-import type { FC, JSX } from 'react';
+import { useRef, type ElementRef, type FC, type JSX } from 'react';
 import { format } from 'date-fns';
 import { Member } from '@prisma/client';
 import { useParams } from 'next/navigation';
@@ -58,6 +58,16 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
             paramValue,
         });
 
+    /**
+     * Chat section reference.
+     */
+    const chatRef = useRef<ElementRef<'div'>>(null);
+
+    /**
+     * Reference section below.
+     */
+    const bottomRef = useRef<ElementRef<'div'>>(null);
+
     // Hook to manage the chat socket.
     useChatSocket({
         addKey: `chat:${chatId}`,
@@ -97,9 +107,29 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
     }
 
     return (
-        <div className="flex-1 flex flex-col py-4 overflow-y-auto">
-            <div className="flex-1" />
-            <ChatWelcome type={type} name={name} />
+        <div
+            className="flex-1 flex flex-col py-4 overflow-y-auto"
+            ref={chatRef}
+        >
+            {!hasNextPage && <div className="flex-1" />}
+            {!hasNextPage && <ChatWelcome type={type} name={name} />}
+            {hasNextPage && (
+                <div className="flex justify-center">
+                    {isFetchingNextPage ? (
+                        <Loader2 className="w-6 h-6 text-zinc-500 animate-spin my-4" />
+                    ) : (
+                        <button
+                            className="
+                                dark:hover:text-zinc-300 dark:text-zinc-400 transition
+                                hover:text-zinc-600 text-zinc-500 text-xs my-4
+                            "
+                            onClick={() => fetchNextPage()}
+                        >
+                            Load previous messages
+                        </button>
+                    )}
+                </div>
+            )}
             <div className="flex flex-col-reverse mt-auto">
                 {data?.pages?.map((group, i) => (
                     <div key={i}>
@@ -128,6 +158,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
                     </div>
                 ))}
             </div>
+            <div ref={bottomRef} />
         </div>
     );
 };
