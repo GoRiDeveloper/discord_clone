@@ -1,4 +1,4 @@
-import { Message } from '@prisma/client';
+import { DirectMessage } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { currentProfile, db } from '@/lib';
@@ -9,11 +9,11 @@ import { currentProfile, db } from '@/lib';
 const MESSAGES_BATCH = 10;
 
 /**
- * Function to find messages in the database.
+ * Function to find direct messages in the database.
  *
  * @param { NextRequest } req - Next request.
  *
- * @returns { Promise<NextResponse> } Found messages.
+ * @returns { Promise<NextResponse> } Found direct messages.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
@@ -31,33 +31,33 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const cursor = searchParams.get('cursor');
 
         /**
-         * Get Channel Id in url params.
+         * Get Conversation Id in url params.
          */
-        const channelId = searchParams.get('channelId');
+        const conversationId = searchParams.get('conversationId');
 
         // If there is no profile in session, return a non-authorization response.
         if (!profile) return new NextResponse('Unauthorized', { status: 401 });
 
-        // In case the channel id does not exist, respond that the channel id does not exist.
-        if (!channelId)
-            return new NextResponse('Channel ID missing', { status: 400 });
+        // In case the conversation id does not exist, respond that the conversation id does not exist.
+        if (!conversationId)
+            return new NextResponse('Conversation ID missing', { status: 400 });
 
         /**
          * Variable to store the messages found in the database.
          */
-        let messages: Message[] = [];
+        let messages: DirectMessage[] = [];
 
-        // If there is a cursor, we search for messages from a specific channel with
-        // that cursor, if not, we search for messages from a specific channel.
+        // If there is a cursor, we search for messages from a specific conversation with
+        // that cursor, if not, we search for messages from a specific conversation.
         if (cursor) {
-            messages = await db.message.findMany({
+            messages = await db.directMessage.findMany({
                 take: MESSAGES_BATCH,
                 skip: 1,
                 cursor: {
                     id: cursor,
                 },
                 where: {
-                    channelId,
+                    conversationId,
                 },
                 include: {
                     member: {
@@ -71,10 +71,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                 },
             });
         } else {
-            messages = await db.message.findMany({
+            messages = await db.directMessage.findMany({
                 take: MESSAGES_BATCH,
                 where: {
-                    channelId,
+                    conversationId,
                 },
                 include: {
                     member: {
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             nextCursor,
         });
     } catch (error) {
-        console.log('[MESSAGES_GET]', error);
+        console.log('[DIRECT_MESSAGES_GET]', error);
         // Return an error response if there is an error.
         return new NextResponse('Internal Error', { status: 500 });
     }
