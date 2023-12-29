@@ -1,16 +1,16 @@
-import { NextApiRequest } from 'next';
 import { MemberRole } from '@prisma/client';
+import { NextApiRequest } from 'next';
 
-import { NextApiResponseServerIo } from '@/types';
 import { currentProfilePages, db } from '@/lib';
+import { NextApiResponseServerIo } from '@/types';
 
 /**
- * Handler for updating a specific message.
+ * Handler for updating a specific direct message.
  *
  * @param { NextApiRequest } req - Next api route request.
  * @param { NextApiResponseServerIo } res - Next Socket Friendly API Route Answer.
  *
- * @returns { Promise<void> } Response to send a message.
+ * @returns { Promise<void> } Response to send a direct message.
  */
 export default async function handler(
     req: NextApiRequest,
@@ -28,9 +28,9 @@ export default async function handler(
         const profile = await currentProfilePages(req);
 
         /**
-         * Destructuring the request query the server id, channel id and the message id.
+         * Destructuring the request query the conversation id and the direct message id.
          */
-        const { messageId, serverId, channelId } = req.query;
+        const { directMessageId, conversationId } = req.query;
 
         /**
          * Destructuring the body of the request the content.
@@ -42,14 +42,14 @@ export default async function handler(
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // In case the message id does not exist, respond that the message id does not exist.
-        if (!messageId) {
-            return res.status(400).json({ error: 'Message ID missing' });
+        // In case the direct message id does not exist, respond that the direct message id does not exist.
+        if (!directMessageId) {
+            return res.status(400).json({ error: 'Direct message ID missing' });
         }
 
-        // In case the channel does not exist, respond that the channel does not exist.
-        if (!channelId) {
-            return res.status(404).json({ message: 'Channel ID missing' });
+        // In case the conversation id does not exist, respond that the conversation id does not exist.
+        if (!conversationId) {
+            return res.status(404).json({ message: 'Conversation ID missing' });
         }
 
         // In case the content does not exist, respond that the content does not exist.
@@ -58,48 +58,50 @@ export default async function handler(
         }
 
         /**
-         * Constant where the server found based on an id is stored.
+         * Constant where the conversation found based on an id is stored.
          */
-        const server = await db.server.findFirst({
+        const conversation = await db.conversation.findFirst({
             where: {
-                id: serverId as string,
-                members: {
-                    some: {
-                        profileId: profile.id,
+                id: conversationId as string,
+                OR: [
+                    {
+                        memberOne: {
+                            profileId: profile.id,
+                        },
+                    },
+                    {
+                        memberTwo: {
+                            profileId: profile.id,
+                        },
+                    },
+                ],
+            },
+            include: {
+                memberOne: {
+                    include: {
+                        profile: true,
+                    },
+                },
+                memberTwo: {
+                    include: {
+                        profile: true,
                     },
                 },
             },
-            include: {
-                members: true,
-            },
         });
 
-        // In case the server does not exist, respond that the server does not exist.
-        if (!server) {
-            return res.status(404).json({ message: 'Server not found' });
+        // In case the conversation does not exist, respond that the conversation does not exist.
+        if (!conversation) {
+            return res.status(404).json({ message: 'Conversation not found' });
         }
 
         /**
-         * Constant where the channel found based on an id is stored.
+         * Constant where the member found.
          */
-        const channel = await db.channel.findFirst({
-            where: {
-                id: channelId as string,
-                serverId: serverId as string,
-            },
-        });
-
-        // In case the channel does not exist, respond that the channel does not exist.
-        if (!channel) {
-            return res.status(404).json({ message: 'Channel not found' });
-        }
-
-        /**
-         * Constant where the member found based on an id is stored.
-         */
-        const member = server.members.find(
-            (member) => member.profileId === profile.id
-        );
+        const member =
+            conversation.memberOne.profileId === profile.id
+                ? conversation.memberOne
+                : conversation.memberTwo;
 
         // In case the member does not exist, respond that the member does not exist.
         if (!member) {
@@ -107,12 +109,12 @@ export default async function handler(
         }
 
         /**
-         * Message founded.
+         * Direct messages founded.
          */
-        let message = await db.message.findFirst({
+        let directMessage = await db.directMessage.findFirst({
             where: {
-                id: messageId as string,
-                channelId: channelId as string,
+                id: directMessageId as string,
+                conversationId: conversationId as string,
             },
             include: {
                 member: {
@@ -124,14 +126,14 @@ export default async function handler(
         });
 
         // If the message does not exist or has been deleted, return that it was not found.
-        if (!message || message.deleted) {
-            return res.status(404).json({ error: 'Message not found' });
+        if (!directMessage || directMessage.deleted) {
+            return res.status(404).json({ error: 'Direct message not found' });
         }
 
         /**
          * Variable for check the message is from the owner.
          */
-        const isMessageOwner = message.memberId === member.id;
+        const isMessageOwner = directMessage.memberId === member.id;
 
         /**
          * Variable for check if user is admin.
@@ -155,9 +157,9 @@ export default async function handler(
 
         // If the method is DELETE, update the message so that it is a deleted message.
         if (req.method === 'DELETE') {
-            message = await db.message.update({
+            directMessage = await db.directMessage.update({
                 where: {
-                    id: messageId as string,
+                    id: directMessageId as string,
                 },
                 data: {
                     fileUrl: null,
@@ -182,9 +184,9 @@ export default async function handler(
             }
 
             // Update message in the database.
-            message = await db.message.update({
+            directMessage = await db.directMessage.update({
                 where: {
-                    id: messageId as string,
+                    id: directMessageId as string,
                 },
                 data: {
                     content,
@@ -200,17 +202,17 @@ export default async function handler(
         }
 
         /**
-         * Message update key to socket.
+         * Direct message update key to socket.
          */
-        const updateKey = `chat:${channelId}:messages:update`;
+        const updateKey = `chat:${conversation.id}:messages:update`;
 
         // Update message in sockets.
-        res?.socket?.server?.io?.emit(updateKey, message);
+        res?.socket?.server?.io?.emit(updateKey, directMessage);
 
         // Return response with message updated.
-        return res.status(200).json(message);
+        return res.status(200).json(directMessage);
     } catch (error) {
-        console.log('[MESSAGE_ID]', error);
+        console.log('[DIRECT_MESSAGE_ID]', error);
         // Return an error response if there is an error.
         return res.status(500).json({ error: 'Internal Error' });
     }

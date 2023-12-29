@@ -4,18 +4,18 @@ import { currentProfilePages, db } from '@/lib';
 import { NextApiResponseServerIo } from '@/types';
 
 /**
- * Chat message manager.
+ * Direct chat message manager.
  *
  * @param { NextApiRequest } req - Next api route request.
  * @param { NextApiResponseServerIo } res - Next Socket Friendly API Route Answer.
  *
- * @returns { Promise<void> } Response to send message.
+ * @returns { Promise<void> } Response to send a direct message.
  */
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponseServerIo
 ): Promise<void> {
-    // If the method is different from POST, respond that the method is not allowed..
+    // If the method is different from POST, respond that the method is not allowed.
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -32,23 +32,18 @@ export default async function handler(
         const { content, fileUrl } = req.body;
 
         /**
-         * Destructuring the request query the server id and the channel id.
+         * Destructuring the request query the conversation id.
          */
-        const { serverId, channelId } = req.query;
+        const { conversationId } = req.query;
 
         // If there is no user logged in, we return an unauthorized error.
         if (!profile) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // In case the server id does not exist, respond that the server id does not exist.
-        if (!serverId) {
-            return res.status(400).json({ error: 'Server ID missing' });
-        }
-
-        // In case the channel id does not exist, respond that the channel id does not exist.
-        if (!channelId) {
-            return res.status(400).json({ error: 'Channel ID missing' });
+        // In case the conversation id does not exist, respond that the conversation id does not exist.
+        if (!conversationId) {
+            return res.status(400).json({ error: 'Conversation ID missing' });
         }
 
         // In case the content does not exist, respond that the content does not exist.
@@ -62,48 +57,50 @@ export default async function handler(
         }
 
         /**
-         * Constant where the server found based on an id is stored.
+         * Direct message conversation.
          */
-        const server = await db.server.findFirst({
+        const conversation = await db.conversation.findFirst({
             where: {
-                id: serverId as string,
-                members: {
-                    some: {
-                        profileId: profile.id,
+                id: conversationId as string,
+                OR: [
+                    {
+                        memberOne: {
+                            profileId: profile.id,
+                        },
+                    },
+                    {
+                        memberTwo: {
+                            profileId: profile.id,
+                        },
+                    },
+                ],
+            },
+            include: {
+                memberOne: {
+                    include: {
+                        profile: true,
+                    },
+                },
+                memberTwo: {
+                    include: {
+                        profile: true,
                     },
                 },
             },
-            include: {
-                members: true,
-            },
         });
 
-        // In case the server does not exist, respond that the server does not exist.
-        if (!server) {
-            return res.status(404).json({ message: 'Server not found' });
+        // In case the conversation does not exist, respond that the conversation does not exist.
+        if (!conversation) {
+            return res.status(404).json({ message: 'Conversation not found.' });
         }
 
         /**
-         * Constant where the channel found based on an id is stored.
+         * Constant where the member found.
          */
-        const channel = await db.channel.findFirst({
-            where: {
-                id: channelId as string,
-                serverId: serverId as string,
-            },
-        });
-
-        // In case the channel does not exist, respond that the channel does not exist.
-        if (!channel) {
-            return res.status(404).json({ message: 'Channel not found' });
-        }
-
-        /**
-         * Constant where the member found based on an id is stored.
-         */
-        const member = server.members.find(
-            (member) => member.profileId === profile.id
-        );
+        const member =
+            conversation.memberOne.profileId === profile.id
+                ? conversation.memberOne
+                : conversation.memberTwo;
 
         // In case the member does not exist, respond that the member does not exist.
         if (!member) {
@@ -113,11 +110,11 @@ export default async function handler(
         /**
          * Constant where the message to be saved in the database is stored.
          */
-        const message = await db.message.create({
+        const message = await db.directMessage.create({
             data: {
                 content,
                 fileUrl,
-                channelId: channelId as string,
+                conversationId: conversationId as string,
                 memberId: member.id,
             },
             include: {
@@ -130,17 +127,17 @@ export default async function handler(
         });
 
         /**
-         * Build the channel key.
+         * Build the conversation key.
          */
-        const channelKey = `chat:${channelId}:messages`;
+        const conversationKey = `chat:${conversationId}:messages`;
 
         // Respond to the client with the previously created message and with the previously constructed key.
-        res?.socket?.server?.io?.emit(channelKey, message);
+        res?.socket?.server?.io?.emit(conversationKey, message);
 
         // Respond with the message in case everything has gone correctly.
         return res.status(200).json(message);
     } catch (error) {
-        console.log('[MESSAGES_POST]', error);
+        console.log('[DIRECT_MESSAGES_POST]', error);
         // Return an error response if there is an error.
         return res.status(500).json({ message: 'Internal Error' });
     }
