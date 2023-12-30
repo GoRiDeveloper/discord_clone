@@ -19,7 +19,7 @@ export default async function handler(
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
-
+    console.log('accionado');
     try {
         /**
          * The current profile in session.
@@ -57,9 +57,9 @@ export default async function handler(
         }
 
         // In case the file url does not exist, respond that the file url does not exist.
-        if (!fileUrl) {
-            return res.status(400).json({ error: 'File url missing' });
-        }
+        // if (!fileUrl) {
+        //     return res.status(400).json({ error: 'File url missing' });
+        // }
 
         /**
          * Constant where the server found based on an id is stored.

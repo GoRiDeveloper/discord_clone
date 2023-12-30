@@ -1,9 +1,8 @@
 'use client';
 
-import { useRef, type ElementRef, type FC, type JSX } from 'react';
+import { useRef, Fragment, type ElementRef, type FC, type JSX } from 'react';
 import { format } from 'date-fns';
 import { Member } from '@prisma/client';
-import { useParams } from 'next/navigation';
 import { Loader2, ServerCrash } from 'lucide-react';
 
 import { ChatWelcome } from '@/components/chat/chat.welcome';
@@ -49,15 +48,6 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
     paramKey,
     type,
 }: ChatMessagesProps): JSX.Element => {
-    // Chat query information.
-    const { data, status, hasNextPage, isFetchingNextPage, fetchNextPage } =
-        useChatQuery({
-            queryKey: `chat:${chatId}`,
-            apiUrl,
-            paramKey,
-            paramValue,
-        });
-
     /**
      * Chat section reference.
      */
@@ -68,11 +58,25 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
      */
     const bottomRef = useRef<ElementRef<'div'>>(null);
 
+    /**
+     * Socket query key.
+     */
+    const queryKey = `chat:${chatId}`;
+
+    // Chat query information.
+    const { data, status, hasNextPage, isFetchingNextPage, fetchNextPage } =
+        useChatQuery({
+            queryKey,
+            apiUrl,
+            paramKey,
+            paramValue,
+        });
+
     // Hook to manage the chat socket.
     useChatSocket({
-        addKey: `chat:${chatId}`,
-        updateKey: `chat:${chatId}:messages`,
-        queryKey: `chat:${chatId}:messages:update`,
+        queryKey,
+        addKey: `chat:${chatId}:messages`,
+        updateKey: `chat:${chatId}:messages:update`,
     });
 
     // Hook to manage the scroll chat.
@@ -84,13 +88,8 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
         loadMore: fetchNextPage,
     });
 
-    /**
-     * Url page params.
-     */
-    //const params = useParams();
-
     // If status is pending, return a load component.
-    if (status === 'pending') {
+    if (status === 'loading') {
         return (
             <div className="flex flex-col flex-1 justify-center items-center">
                 <Loader2 className="w-7 h-7 text-zinc-500 animate-spin my-4" />
@@ -114,7 +113,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
             </div>
         );
     }
-
+    console.log(data);
     return (
         <div
             className="flex-1 flex flex-col py-4 overflow-y-auto"
@@ -141,7 +140,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
             )}
             <div className="flex flex-col-reverse mt-auto">
                 {data?.pages?.map((group, i) => (
-                    <div key={i}>
+                    <Fragment key={i}>
                         {group.items.map(
                             (message: MessageWithMemberWithProfile) => (
                                 <ChatItem
@@ -164,7 +163,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
                                 />
                             )
                         )}
-                    </div>
+                    </Fragment>
                 ))}
             </div>
             <div ref={bottomRef} />

@@ -93,7 +93,7 @@ const MemberIdPage: FC<MemberIdPageProps> = async ({
                 type="conversation"
                 apiUrl="/api/direct-messages"
                 paramKey="conversationId"
-                socketUrl="/api/sockert/direct-messages"
+                socketUrl="/api/socket/direct-messages"
             />
             <ChatInput
                 name={otherMember.profile.name}

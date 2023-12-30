@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { Plus } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import type { FC, JSX } from 'react';
@@ -142,6 +142,15 @@ export const ChatInput: FC<ChatInputProps> = ({
                                         disabled={isLoading}
                                         {...field}
                                     />
+                                    {isLoading && (
+                                        <Loader2
+                                            className="
+                                                absolute right-20 animate-spin
+                                                text-zinc h-6 w-6 top-7
+                                            "
+                                        />
+                                    )}
+
                                     <div className="absolute top-7 right-8">
                                         <EmojiPicker
                                             onChange={(emoji: string) =>
