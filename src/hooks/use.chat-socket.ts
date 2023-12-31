@@ -99,7 +99,7 @@ export const useChatSocket = ({
             oldData: any,
             message: MessageWithMemberWithProfile
         ) => {
-            if (!oldData || oldData.pages || oldData.pages.length === 0) {
+            if (!oldData || !oldData.pages || oldData.pages.length === 0) {
                 return {
                     pages: [
                         {
