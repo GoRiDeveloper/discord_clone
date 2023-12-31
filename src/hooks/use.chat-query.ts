@@ -1,4 +1,7 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+    UseInfiniteQueryOptions,
+    useInfiniteQuery,
+} from '@tanstack/react-query';
 import qs from 'query-string';
 
 import { useSocketContext } from '@/hooks';
@@ -67,15 +70,17 @@ export const useChatQuery = ({
         return res.json();
     };
 
-    /**
-     * Infinite query request information.
-     */
-    const queryData = useInfiniteQuery({
+    const queryOptions = {
         queryKey: [queryKey],
         refetchInterval: isConnected ? false : 1000,
         queryFn: fetchMessages,
         getNextPageParam: (lastPage: any) => lastPage?.nextCursor,
-    });
+    };
+
+    /**
+     * Infinite query request information.
+     */
+    const queryData = useInfiniteQuery(queryOptions as UseInfiniteQueryOptions);
 
     return { ...queryData };
 };
