@@ -1,8 +1,8 @@
-import { NextApiRequest } from 'next';
 import { MemberRole } from '@prisma/client';
+import { NextApiRequest } from 'next';
 
-import { NextApiResponseServerIo } from '@/types';
 import { currentProfilePages, db } from '@/lib';
+import { NextApiResponseServerIo } from '@/types';
 
 /**
  * Handler for updating a specific message.
@@ -50,11 +50,6 @@ export default async function handler(
         // In case the channel does not exist, respond that the channel does not exist.
         if (!channelId) {
             return res.status(404).json({ message: 'Channel ID missing' });
-        }
-
-        // In case the content does not exist, respond that the content does not exist.
-        if (!content) {
-            return res.status(400).json({ error: 'Content missing' });
         }
 
         /**
@@ -179,6 +174,11 @@ export default async function handler(
             // If the user not owner message.
             if (!isMessageOwner) {
                 return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            // In case the content does not exist, respond that the content does not exist.
+            if (!content) {
+                return res.status(400).json({ error: 'Content missing' });
             }
 
             // Update message in the database.

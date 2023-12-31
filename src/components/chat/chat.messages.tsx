@@ -1,13 +1,13 @@
 'use client';
 
-import { useRef, Fragment, type ElementRef, type FC, type JSX } from 'react';
-import { format } from 'date-fns';
 import { Member } from '@prisma/client';
+import { format } from 'date-fns';
 import { Loader2, ServerCrash } from 'lucide-react';
+import { Fragment, useRef, type ElementRef, type FC, type JSX } from 'react';
 
-import { ChatWelcome } from '@/components/chat/chat.welcome';
 import { ChatItem } from '@/components/chat/chat.item';
-import { useChatQuery, useChatSocket, useChatScroll } from '@/hooks';
+import { ChatWelcome } from '@/components/chat/chat.welcome';
+import { useChatQuery, useChatScroll, useChatSocket } from '@/hooks';
 import type { MessageWithMemberWithProfile } from '@/models';
 
 /**
@@ -113,7 +113,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
             </div>
         );
     }
-    console.log(data);
+
     return (
         <div
             className="flex-1 flex flex-col py-4 overflow-y-auto"
@@ -141,7 +141,7 @@ export const ChatMessages: FC<ChatMessagesProps> = ({
             <div className="flex flex-col-reverse mt-auto">
                 {data?.pages?.map((group, i) => (
                     <Fragment key={i}>
-                        {group.items.map(
+                        {group?.items?.map(
                             (message: MessageWithMemberWithProfile) => (
                                 <ChatItem
                                     key={message.id}
