@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import type { FC } from 'react';
 
 import { db, getAuthProfile } from '@/lib';
+import { redirectToSpecificServer } from '@/lib/server';
 
 /**
  * Props for invitation code page.
@@ -47,26 +48,11 @@ const InviteCodePage: FC<InviteCodePageProps> = async ({
     // If the server where the user is as a member was found, return the found server.
     if (existingServer) return redirect(`/servers/${existingServer.id}`);
 
-    /**
-     * Invitation code server.
-     */
-    const server = await db.server.update({
-        where: {
-            inviteCode: params.inviteCode,
-        },
-        data: {
-            members: {
-                create: [
-                    {
-                        profileId: profile.id,
-                    },
-                ],
-            },
-        },
+    redirectToSpecificServer({
+        inviteCode: params.inviteCode,
+        profileId: profile.id,
+        inviteCodeRedirect: true,
     });
-
-    // If the invitation code server, return the found server.
-    if (server) return redirect(`/servers/${server.id}`);
 
     return null;
 };

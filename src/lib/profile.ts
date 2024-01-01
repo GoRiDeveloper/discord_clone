@@ -16,6 +16,6 @@ export const getAuthProfile = async () => {
         return redirectToSignIn({
             returnBackUrl: 'http://localhost:3000/',
         });
-        
+
     return profile;
 };
