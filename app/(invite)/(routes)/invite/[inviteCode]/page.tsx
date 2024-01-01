@@ -1,8 +1,7 @@
-import { redirectToSignIn } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import type { FC } from 'react';
 
-import { currentProfile, db } from '@/lib';
+import { db, getAuthProfile } from '@/lib';
 
 /**
  * Props for invitation code page.
@@ -26,13 +25,7 @@ const InviteCodePage: FC<InviteCodePageProps> = async ({
     /**
      * The current profile in session.
      */
-    const profile = await currentProfile();
-
-    // Check if the profile exists, if not, redirect to authenticate.
-    if (!profile)
-        return redirectToSignIn({
-            returnBackUrl: 'http://localhost:3000/',
-        });
+    const profile = await getAuthProfile();
 
     // If there is no server id, redirect to main page.
     if (!params.inviteCode) return redirect('/');
