@@ -31,6 +31,7 @@ const ioHandler = (
             addTrailingSlash: false,
             cors: {
                 origin: '*',
+                methods: '*',
             },
         });
 
