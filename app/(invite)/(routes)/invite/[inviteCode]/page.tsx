@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation';
 import type { FC } from 'react';
+import { redirectToSignIn } from "@clerk/nextjs";
 
-import { db, getAuthProfile } from '@/lib';
+import { db, getProfile } from '@/lib';
 import { redirectToSpecificServer } from '@/lib/server';
+import { AppRoutes, BASE_URL } from '@/models';
 
 /**
  * Props for invitation code page.
@@ -23,13 +25,22 @@ interface InviteCodePageProps {
 const InviteCodePage: FC<InviteCodePageProps> = async ({
     params,
 }: InviteCodePageProps): Promise<null | never> => {
+    const { getAuthProfile } = await getProfile();
+
     /**
      * The current profile in session.
      */
-    const profile = await getAuthProfile();
+    const profile = getAuthProfile();
+
+    // Check if the profile exists, if not, redirect to authenticate.
+    if (!profile) {
+        return redirectToSignIn({
+            returnBackUrl: BASE_URL,
+        });
+    }
 
     // If there is no server id, redirect to main page.
-    if (!params.inviteCode) return redirect('/');
+    if (!params.inviteCode) return redirect(AppRoutes.HOME);
 
     /**
      * Found server where the user is as a member.
@@ -46,9 +57,9 @@ const InviteCodePage: FC<InviteCodePageProps> = async ({
     });
 
     // If the server where the user is as a member was found, return the found server.
-    if (existingServer) return redirect(`/servers/${existingServer.id}`);
+    if (existingServer) return redirect(AppRoutes.SERVER_ID(existingServer.id));
 
-    redirectToSpecificServer({
+    await redirectToSpecificServer({
         inviteCode: params.inviteCode,
         profileId: profile.id,
         inviteCodeRedirect: true,

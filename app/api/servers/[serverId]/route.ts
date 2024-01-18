@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { currentProfile, db } from '@/lib';
+import { getProfile, db } from '@/lib';
+import { ApiErrors, HTTP_CODE_ERRORS } from '@/models';
 
 /**
  * Patch parameters.
@@ -22,15 +23,13 @@ export async function PATCH(
     { params }: ServerIdParams
 ): Promise<NextResponse> {
     try {
-        /**
-         * The current profile in session.
-         */
-        const profile = await currentProfile();
+        const { getServerProfile } = await getProfile();
+
+        // The current profile in session.
+        getServerProfile();
+
         // Destructure the client information to modify the server.
         const { name, imageUrl } = await req.json();
-
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
 
         /**
          * Update the server in the database.
@@ -48,9 +47,11 @@ export async function PATCH(
         // Return the server updated.
         return NextResponse.json(server);
     } catch (error) {
-        console.error('[SERVER_ID_PATCH]', error);
+        console.error(ApiErrors.SERVER_ID_PATCH, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }
 
@@ -63,17 +64,16 @@ export async function PATCH(
  * @returns { Promise<NextResponse> } Response to server deletion.
  */
 export async function DELETE(
-    req: NextRequest,
+    _req: NextRequest,
     { params }: ServerIdParams
 ): Promise<NextResponse> {
     try {
+        const { getServerProfile } = await getProfile();
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfile();
-
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
+        const profile = getServerProfile();
 
         /**
          * Delete the server in the database.
@@ -81,15 +81,17 @@ export async function DELETE(
         const server = await db.server.delete({
             where: {
                 id: params.serverId,
-                profileId: profile.id,
+                profileId: (profile as any).id,
             },
         });
 
         // Return a response from the deleted server.
         return NextResponse.json(server);
     } catch (error) {
-        console.error('[DELETE_SERVER_ID_ERROR]', error);
+        console.error(ApiErrors.DELETE_SERVER_ID_ERROR, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }

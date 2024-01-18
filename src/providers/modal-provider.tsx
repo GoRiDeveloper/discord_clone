@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, type FC, type JSX } from 'react';
+import type { FC, JSX } from 'react';
 
+import { useMounted } from '@/hooks';
 import { CreateChannelModal } from '@/components/modals/create-channel.modal';
 import { CreateServerModal } from '@/components/modals/create-server.modal';
 import { DeleteChannelModal } from '@/components/modals/delete-channel.modal';
@@ -19,16 +20,7 @@ import { MessageFileModal } from '@/components/modals/message-file.modal';
  * @returns { JSX.Element | null } Provider for application modals.
  */
 export const ModalProvider: FC = (): JSX.Element | null => {
-    // State for component.
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        // Change state for component.
-        setIsMounted(true);
-    }, []);
-
-    // If the component is not mounted, we return null.
-    if (!isMounted) return null;
+    useMounted({ valueToReturn: null });
 
     return (
         <>

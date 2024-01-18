@@ -1,7 +1,14 @@
 import { MemberRole } from '@prisma/client';
 import { NextApiRequest } from 'next';
 
-import { currentProfilePages, db } from '@/lib';
+import {
+    ApiErrors,
+    HTTP_CODE,
+    HTTP_CODE_ERRORS,
+    HTTP_METHODS,
+    socketKeys,
+} from '@/models';
+import { getProfile, db } from '@/lib';
 import { NextApiResponseServerIo } from '@/types';
 
 /**
@@ -17,15 +24,22 @@ export default async function handler(
     res: NextApiResponseServerIo
 ): Promise<void> {
     // If the method is different from DELETE or PATCH, respond that the method is not allowed.
-    if (req.method !== 'DELETE' && req.method !== 'PATCH') {
-        return res.status(405).json({ error: 'Method not allowed' });
+    if (
+        req.method !== HTTP_METHODS.DELETE &&
+        req.method !== HTTP_METHODS.PATCH
+    ) {
+        return res.status(HTTP_CODE_ERRORS.METHOD_NOT_ALLOWED).json({
+            error: ApiErrors.METHOD_NOT_ALLOWED,
+        });
     }
 
     try {
+        const { getPagesServerProfile } = await getProfile(req, res);
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfilePages(req);
+        const profile = getPagesServerProfile();
 
         /**
          * Destructuring the request query the conversation id and the direct message id.
@@ -37,24 +51,18 @@ export default async function handler(
          */
         const { content } = req.body;
 
-        // If there is no user logged in, we return an unauthorized error.
-        if (!profile) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
         // In case the direct message id does not exist, respond that the direct message id does not exist.
         if (!directMessageId) {
-            return res.status(400).json({ error: 'Direct message ID missing' });
+            return res.status(HTTP_CODE_ERRORS.BAD_REQUEST).json({
+                error: ApiErrors.DIRECT_MESSAGE_ID_MISSING,
+            });
         }
 
         // In case the conversation id does not exist, respond that the conversation id does not exist.
         if (!conversationId) {
-            return res.status(404).json({ message: 'Conversation ID missing' });
-        }
-
-        // In case the content does not exist, respond that the content does not exist.
-        if (!content) {
-            return res.status(400).json({ error: 'Content missing' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.CONVERSATION_ID_MISSING,
+            });
         }
 
         /**
@@ -66,12 +74,12 @@ export default async function handler(
                 OR: [
                     {
                         memberOne: {
-                            profileId: profile.id,
+                            profileId: (profile as any).id,
                         },
                     },
                     {
                         memberTwo: {
-                            profileId: profile.id,
+                            profileId: (profile as any).id,
                         },
                     },
                 ],
@@ -92,20 +100,24 @@ export default async function handler(
 
         // In case the conversation does not exist, respond that the conversation does not exist.
         if (!conversation) {
-            return res.status(404).json({ message: 'Conversation not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.CONVERSATION_NOT_FOUND,
+            });
         }
 
         /**
          * Constant where the member found.
          */
         const member =
-            conversation.memberOne.profileId === profile.id
+            conversation.memberOne.profileId === (profile as any).id
                 ? conversation.memberOne
                 : conversation.memberTwo;
 
         // In case the member does not exist, respond that the member does not exist.
         if (!member) {
-            return res.status(404).json({ message: 'Member not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.MEMBER_NOT_FOUND,
+            });
         }
 
         /**
@@ -127,7 +139,9 @@ export default async function handler(
 
         // If the message does not exist or has been deleted, return that it was not found.
         if (!directMessage || directMessage.deleted) {
-            return res.status(404).json({ error: 'Direct message not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                error: ApiErrors.DIRECT_MESSAGE_ID_NOT_FOUND,
+            });
         }
 
         /**
@@ -152,11 +166,13 @@ export default async function handler(
 
         // If you cannot modify the message, we return an unauthorized response.
         if (!canModify) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(HTTP_CODE_ERRORS.UNAUTHORIZED).json({
+                error: ApiErrors.UNAUTHORIZED,
+            });
         }
 
         // If the method is DELETE, update the message so that it is a deleted message.
-        if (req.method === 'DELETE') {
+        if (req.method === HTTP_METHODS.DELETE) {
             directMessage = await db.directMessage.update({
                 where: {
                     id: directMessageId as string,
@@ -177,10 +193,26 @@ export default async function handler(
         }
 
         // If the method is PATCH, update the message.
-        if (req.method === 'PATCH') {
+        if (req.method === HTTP_METHODS.PATCH) {
             // If the user not owner message.
             if (!isMessageOwner) {
-                return res.status(401).json({ message: 'Unauthorized' });
+                return res.status(HTTP_CODE_ERRORS.UNAUTHORIZED).json({
+                    message: ApiErrors.UNAUTHORIZED,
+                });
+            }
+
+            // If the message is the same as the message in the database, return an error.
+            if (directMessage.content === content) {
+                return res.status(HTTP_CODE_ERRORS.BAD_REQUEST).json({
+                    message: ApiErrors.EQUAL_MESSAGE,
+                });
+            }
+
+            // In case the content does not exist, respond that the content does not exist.
+            if (!content) {
+                return res.status(HTTP_CODE_ERRORS.BAD_REQUEST).json({
+                    error: ApiErrors.CONTENT_MISSING,
+                });
             }
 
             // Update message in the database.
@@ -204,16 +236,18 @@ export default async function handler(
         /**
          * Direct message update key to socket.
          */
-        const updateKey = `chat:${conversation.id}:messages:update`;
+        const updateKey = socketKeys.UPDATE_KEY(conversation.id);
 
         // Update message in sockets.
         res?.socket?.server?.io?.emit(updateKey, directMessage);
 
         // Return response with message updated.
-        return res.status(200).json(directMessage);
+        return res.status(HTTP_CODE.SUCCESS).json(directMessage);
     } catch (error) {
-        console.log('[DIRECT_MESSAGE_ID]', error);
+        console.log(ApiErrors.DIRECT_MESSAGE_ID, error);
         // Return an error response if there is an error.
-        return res.status(500).json({ error: 'Internal Error' });
+        return res.status(HTTP_CODE_ERRORS.INTERNAL_ERROR).json({
+            error: ApiErrors.INTERNAL_ERROR,
+        });
     }
 }

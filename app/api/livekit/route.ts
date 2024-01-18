@@ -1,19 +1,21 @@
 import { AccessToken } from 'livekit-server-sdk';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { SearchParamsModel, ApiErrors, HTTP_CODE_ERRORS } from '@/models';
+
 export async function GET(req: NextRequest) {
-    const room = req.nextUrl.searchParams.get('room');
-    const username = req.nextUrl.searchParams.get('username');
+    const room = req.nextUrl.searchParams.get(SearchParamsModel.ROOM);
+    const username = req.nextUrl.searchParams.get(SearchParamsModel.USERNAME);
 
     if (!room) {
         return NextResponse.json(
-            { error: 'Missing "room" query parameter' },
-            { status: 400 }
+            { error: ApiErrors.ROOM_MISSING },
+            { status: HTTP_CODE_ERRORS.BAD_REQUEST }
         );
     } else if (!username) {
         return NextResponse.json(
-            { error: 'Missing "username" query parameter' },
-            { status: 400 }
+            { error: ApiErrors.USERNAME_MISSING },
+            { status: HTTP_CODE_ERRORS.BAD_REQUEST }
         );
     }
 
@@ -23,8 +25,8 @@ export async function GET(req: NextRequest) {
 
     if (!apiKey || !apiSecret || !wsUrl) {
         return NextResponse.json(
-            { error: 'Server misconfigured' },
-            { status: 500 }
+            { error: ApiErrors.SERVER_MISCONFIGURED },
+            { status: HTTP_CODE_ERRORS.INTERNAL_ERROR }
         );
     }
 

@@ -12,6 +12,7 @@ import {
 import { io as ClientIO } from 'socket.io-client';
 
 import { useToggle } from '@/hooks';
+import { SocketApiRoutes } from '@/models';
 
 /**
  * Model for sockets context.
@@ -59,7 +60,7 @@ export const SocketContextProvider: FC<PropsWithChildren> = ({
         const SocketInstance = new (ClientIO as any)(
             process.env.NEXT_PUBLIC_SITE_URL!,
             {
-                path: '/api/socket/io',
+                path: SocketApiRoutes.IO,
                 addTrailingSlash: false,
             }
         );

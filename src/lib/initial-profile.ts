@@ -1,5 +1,7 @@
-import { currentUser, redirectToSignIn } from '@clerk/nextjs';
-import { db } from './db';
+import { redirectToSignIn } from '@clerk/nextjs';
+
+import { BASE_URL } from '@/models';
+import { db, getProfile } from './';
 
 /**
  * Function to get the initial user.
@@ -7,16 +9,19 @@ import { db } from './db';
  * @returns { Promise<any> } Function to get the initial user.
  */
 export const initialProfile = async (): Promise<any> => {
+    const { getAuthProfile } = await getProfile(undefined, undefined, true);
+
     /**
      * Reference to save the current user if it exists.
      */
-    const user = await currentUser();
+    const user = getAuthProfile();
 
-    // Check if the user exists, if not, redirect the user to authenticate.
-    if (!user)
+    // Check if the profile exists, if not, redirect to authenticate.
+    if (!user) {
         return redirectToSignIn({
-            returnBackUrl: 'http://localhost:3000/',
+            returnBackUrl: BASE_URL,
         });
+    }
 
     /**
      * Reference to save the found user in the database.
@@ -36,7 +41,7 @@ export const initialProfile = async (): Promise<any> => {
     const newProfile = await db.profile.create({
         data: {
             userId: user.id,
-            name: `${user.firstName} ${user.lastName}`,
+            name: `${user.firstName} ${user.lastName || ''}`,
             imageUrl: user.imageUrl,
             email: user.emailAddresses[0].emailAddress,
         },

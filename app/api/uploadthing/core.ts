@@ -1,6 +1,8 @@
 import { auth } from '@clerk/nextjs';
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
 
+import { ApiErrors } from "@/models";
+
 const f = createUploadthing();
 
 /**
@@ -15,7 +17,7 @@ const handleAuth = (): any => {
     const { userId } = auth();
 
     // Verify if there is information about the authenticated user, if not we send an authorization error.
-    if (!userId) throw new Error('Unauthorized');
+    if (!userId) throw new Error(ApiErrors.UNAUTHORIZED);
 
     // Return reference to save authenticated user information.
     return { userId };

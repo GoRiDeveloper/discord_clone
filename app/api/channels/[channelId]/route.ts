@@ -1,7 +1,13 @@
 import { MemberRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { currentProfile, db } from '@/lib';
+import { db, getProfile } from '@/lib';
+import {
+    APP_CHANNELS,
+    ApiErrors,
+    HTTP_CODE_ERRORS,
+    SearchParamsModel,
+} from '@/models';
 
 /**
  * Delete channel parameters.
@@ -17,12 +23,17 @@ interface ParamsChannelId {
  *
  * @returns { Promise<NextResponse> } Response when edit channel to server in database.
  */
-export async function PATCH(req: NextRequest, { params }: ParamsChannelId) {
+export async function PATCH(
+    req: NextRequest,
+    { params }: ParamsChannelId
+): Promise<NextResponse> {
     try {
+        const { getServerProfile } = await getProfile();
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfile();
+        const profile = getServerProfile();
 
         // Search parameters in the url.
         const { searchParams } = new URL(req.url);
@@ -30,22 +41,21 @@ export async function PATCH(req: NextRequest, { params }: ParamsChannelId) {
         /**
          * Server id from the search parameters in the url.
          */
-        const serverId = searchParams.get('serverId');
+        const serverId = searchParams.get(SearchParamsModel.SERVER_ID);
 
         // Get name and type channel form client.
         const { name, type } = await req.json();
 
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
-
         // If there is no server id, it returns a response that there is no server id.
         if (!serverId)
-            return new NextResponse('Server ID missing', { status: 400 });
+            return new NextResponse(ApiErrors.SERVER_ID_MISSING, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
+            });
 
         // if the name is "general", we return an error since the name cannot be "general".
-        if (name === 'general')
-            return new NextResponse('Name cannot be "general"', {
-                status: 400,
+        if (name === APP_CHANNELS.GENERAL)
+            return new NextResponse(ApiErrors.NAME_NOT_GENERAL, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
             });
 
         /**
@@ -56,7 +66,7 @@ export async function PATCH(req: NextRequest, { params }: ParamsChannelId) {
                 id: serverId,
                 members: {
                     some: {
-                        profileId: profile.id,
+                        profileId: (profile as any).id,
                         role: {
                             in: [MemberRole.ADMIN, MemberRole.MODERATOR],
                         },
@@ -69,7 +79,7 @@ export async function PATCH(req: NextRequest, { params }: ParamsChannelId) {
                         where: {
                             id: params.channelId,
                             NOT: {
-                                name: 'general',
+                                name: APP_CHANNELS.GENERAL,
                             },
                         },
                         data: {
@@ -84,9 +94,11 @@ export async function PATCH(req: NextRequest, { params }: ParamsChannelId) {
         // Return the server with the channel deleted.
         return NextResponse.json(server);
     } catch (error) {
-        console.log('[CHANNEL_ID_PATCH]', error);
+        console.log(ApiErrors.CHANNEL_ID_PATCH_ERROR, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }
 
@@ -102,10 +114,12 @@ export async function DELETE(
     { params }: ParamsChannelId
 ): Promise<NextResponse> {
     try {
+        const { getServerProfile } = await getProfile();
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfile();
+        const profile = getServerProfile();
 
         // Search parameters in the url.
         const { searchParams } = new URL(req.url);
@@ -113,14 +127,13 @@ export async function DELETE(
         /**
          * Server id from the search parameters in the url.
          */
-        const serverId = searchParams.get('serverId');
+        const serverId = searchParams.get(SearchParamsModel.SERVER_ID);
 
         // If there is no server id, it returns a response that there is no server id.
         if (!serverId)
-            return new NextResponse('Server ID missing', { status: 400 });
-
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
+            return new NextResponse(ApiErrors.SERVER_ID_MISSING, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
+            });
 
         /**
          * Server: delete the channel on the server.
@@ -130,7 +143,7 @@ export async function DELETE(
                 id: serverId,
                 members: {
                     some: {
-                        profileId: profile.id,
+                        profileId: (profile as any).id,
                         role: {
                             in: [MemberRole.ADMIN, MemberRole.MODERATOR],
                         },
@@ -142,7 +155,7 @@ export async function DELETE(
                     delete: {
                         id: params.channelId,
                         name: {
-                            not: 'general',
+                            not: APP_CHANNELS.GENERAL,
                         },
                     },
                 },
@@ -152,8 +165,10 @@ export async function DELETE(
         // Return the server with the channel deleted.
         return NextResponse.json(server);
     } catch (error) {
-        console.log('[CHANNEL_ID_DELETE]', error);
+        console.log(ApiErrors.CHANNEL_ID_DELETE_ERROR, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }

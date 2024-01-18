@@ -1,8 +1,9 @@
-import { redirectToSignIn } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import type { FC, JSX } from 'react';
+import { redirectToSignIn } from '@clerk/nextjs';
 
-import { currentProfile, db } from '@/lib';
+import { db, getProfile } from '@/lib';
+import { AppRoutes, APP_CHANNELS, BASE_URL } from '@/models';
 
 /**
  * Server Id Page Props.
@@ -21,16 +22,19 @@ interface ServerIdPageProps {
 const ServerIdPage: FC<ServerIdPageProps> = async ({
     params,
 }: ServerIdPageProps): Promise<JSX.Element | null> => {
+    const { getAuthProfile } = await getProfile();
+
     /**
      * The current profile in session.
      */
-    const profile = await currentProfile();
+    const profile = getAuthProfile();
 
-    // If there is no profile in session, return a non-authorization response.
-    if (!profile)
+    // Check if the profile exists, if not, redirect to authenticate.
+    if (!profile) {
         return redirectToSignIn({
-            returnBackUrl: 'http://localhost:3000/',
+            returnBackUrl: BASE_URL,
         });
+    }
 
     /**
      * Current server.
@@ -62,13 +66,11 @@ const ServerIdPage: FC<ServerIdPageProps> = async ({
     const initialChannel = server?.channels[0];
 
     /**
-     * If the channel found is not the general channel, return null.
+     *  If the channel found is not the general channel, return null.
      */
-    if (initialChannel?.name !== 'general') return null;
+    if (initialChannel?.name !== APP_CHANNELS.GENERAL) return null;
 
-    return redirect(
-        `/servers/${params?.serverId}/channels/${initialChannel.id}`
-    );
+    return redirect(AppRoutes.CHANNEL_ID(params?.serverId, initialChannel.id));
 };
 
 export default ServerIdPage;

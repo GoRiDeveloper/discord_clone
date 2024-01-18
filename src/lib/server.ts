@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { db } from '@/lib';
+import { AppRoutes } from '@/models';
 
 /**
  * Model for the function of directing a specific server.
@@ -24,33 +25,37 @@ export const redirectToSpecificServer = async ({
     inviteCodeRedirect,
 }: RedirectToSpecificServerProps): Promise<void | never> => {
     /**
-     * Invitation code server.
+     * Server found.
      */
-    const server = inviteCodeRedirect
-        ? await db.server.update({
-              where: {
-                  inviteCode: inviteCode,
-              },
-              data: {
-                  members: {
-                      create: [
-                          {
-                              profileId: profileId,
-                          },
-                      ],
-                  },
-              },
-          })
-        : await db.server.findFirst({
-              where: {
-                  members: {
-                      some: {
-                          profileId: profileId,
-                      },
-                  },
-              },
-          });
+    let server;
 
-    // If the invitation code server, return the found server.
-    if (server) return redirect(`/servers/${server.id}`);
+    if (inviteCodeRedirect) {
+        server = await db.server.update({
+            where: {
+                inviteCode: inviteCode,
+            },
+            data: {
+                members: {
+                    create: [
+                        {
+                            profileId: profileId,
+                        },
+                    ],
+                },
+            },
+        });
+    } else {
+        server = await db.server.findFirst({
+            where: {
+                members: {
+                    some: {
+                        profileId,
+                    },
+                },
+            },
+        });
+    }
+
+    // If the invitation code server or found server, return the found server.
+    if (server) return redirect(AppRoutes.SERVER_ID(server.id));
 };

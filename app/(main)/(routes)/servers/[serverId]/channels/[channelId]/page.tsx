@@ -1,12 +1,15 @@
-import { redirectToSignIn } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
 import type { FC, JSX } from 'react';
-
-import { ChatHeader, ChatInput } from '@/components';
-import { ChatMessages } from '@/components/chat/chat.messages';
-import { MediaRoom } from '@/components/media-room';
-import { currentProfile, db } from '@/lib';
 import { ChannelType } from '@prisma/client';
+
+import { MediaRoom } from '../../../../../components';
+import { ChatMessages, ChatHeader } from '../../../../../components/chat';
+import { ChatInput } from '../../../../../components/chat/chat.input';
+import { useChannelId } from './hooks';
+import {
+    ChatType,
+    ParamKeyModel,
+    MessagesApiRoutes,
+} from '../../../../../models';
 
 /**
  * Channel id page properties model.
@@ -28,53 +31,26 @@ interface ChannelIdPageProps {
 const ChannelIdPage: FC<ChannelIdPageProps> = async ({
     params: { serverId, channelId },
 }: ChannelIdPageProps): Promise<JSX.Element> => {
-    /**
-     * The current profile in session.
-     */
-    const profile = await currentProfile();
-
-    // If there is no profile in session, return a non-authorization response.
-    if (!profile)
-        return redirectToSignIn({
-            returnBackUrl: 'http://localhost:3000/',
-        });
-
-    /**
-     * Channel id found.
-     */
-    const channel = await db.channel.findUnique({
-        where: {
-            id: channelId,
-        },
+    // Channel id found and first member found on server using parameters.
+    const { channel, member, generalChannelId } = await useChannelId({
+        serverId,
+        channelId,
     });
-
-    /**
-     * First member found on server using parameters.
-     */
-    const member = await db.member.findFirst({
-        where: {
-            serverId: serverId,
-            profileId: profile.id,
-        },
-    });
-
-    // If the specific member or channel is not found, return to the main page.
-    if (!channel || !member) redirect('/');
 
     return (
         <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
             <ChatHeader
                 serverId={serverId}
-                name={channel.name}
-                type={'channel'}
+                name={channel?.name}
+                type={ChatType.channel}
             />
             {channel.type === ChannelType.TEXT && (
                 <>
                     <ChatMessages
-                        type="channel"
-                        apiUrl="/api/messages"
-                        socketUrl="/api/socket/messages"
-                        paramKey="channelId"
+                        paramKey={ParamKeyModel.CHANNEL_KEY}
+                        type={ChatType.channel}
+                        apiUrl={MessagesApiRoutes.MESSAGES}
+                        socketUrl={MessagesApiRoutes.MESSAGES_SOCKET}
                         member={member}
                         name={channel.name}
                         paramValue={channel.id}
@@ -85,9 +61,9 @@ const ChannelIdPage: FC<ChannelIdPageProps> = async ({
                         }}
                     />
                     <ChatInput
+                        apiUrl={MessagesApiRoutes.MESSAGES_SOCKET}
                         name={channel.name}
-                        type="channel"
-                        apiUrl="/api/socket/messages"
+                        type={ChatType.channel}
                         query={{
                             channelId,
                             serverId,
@@ -96,10 +72,20 @@ const ChannelIdPage: FC<ChannelIdPageProps> = async ({
                 </>
             )}
             {channel.type === ChannelType.AUDIO && (
-                <MediaRoom chatId={channel.id} audio={true} video={false} />
+                <MediaRoom
+                    chatId={channel.id}
+                    audio={true}
+                    video={false}
+                    params={{ serverId, channelId: generalChannelId }}
+                />
             )}
             {channel.type === ChannelType.VIDEO && (
-                <MediaRoom chatId={channel.id} audio={false} video={true} />
+                <MediaRoom
+                    chatId={channel.id}
+                    audio={false}
+                    video={true}
+                    params={{ serverId, channelId: generalChannelId }}
+                />
             )}
         </div>
     );

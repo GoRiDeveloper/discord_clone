@@ -1,3 +1,5 @@
+'use client';
+
 import type { FC, JSX, PropsWithChildren } from 'react';
 
 import { SocketContextProvider } from '@/context';

@@ -1,8 +1,7 @@
 import type { FC, JSX } from 'react';
 
-import { InitialModal } from '@/components/modals/initial.modal';
-import { initialProfile } from '@/lib';
-import { redirectToSpecificServer } from '@/lib/server';
+import { initialProfile, redirectToSpecificServer } from '@/lib';
+import { InitialModal } from './components';
 
 /**
  * Setup page component.
@@ -15,7 +14,7 @@ const SetupPage: FC = async (): Promise<JSX.Element> => {
      */
     const profile = await initialProfile();
 
-    redirectToSpecificServer({
+    await redirectToSpecificServer({
         profileId: profile.id,
         inviteCodeRedirect: false,
     });

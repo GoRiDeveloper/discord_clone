@@ -1,7 +1,8 @@
 import { DirectMessage } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { currentProfile, db } from '@/lib';
+import { getProfile, db } from '@/lib';
+import { ApiErrors, HTTP_CODE_ERRORS, SearchParamsModel } from '@/models';
 
 /**
  * Messages batch.
@@ -17,10 +18,10 @@ const MESSAGES_BATCH = 10;
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
-        /**
-         * The current profile in session.
-         */
-        const profile = await currentProfile();
+        const { getServerProfile } = await getProfile();
+
+        // The current profile in session.
+        getServerProfile();
 
         // Search parameters in the url.
         const { searchParams } = new URL(req.url);
@@ -28,19 +29,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         /**
          * Cursor param.
          */
-        const cursor = searchParams.get('cursor');
+        const cursor = searchParams.get(SearchParamsModel.CURSOR);
 
         /**
          * Get Conversation Id in url params.
          */
-        const conversationId = searchParams.get('conversationId');
-
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
+        const conversationId = searchParams.get(
+            SearchParamsModel.CONVERSATION_ID
+        );
 
         // In case the conversation id does not exist, respond that the conversation id does not exist.
         if (!conversationId)
-            return new NextResponse('Conversation ID missing', { status: 400 });
+            return new NextResponse(ApiErrors.CONVERSATION_ID_MISSING, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
+            });
 
         /**
          * Variable to store the messages found in the database.
@@ -104,8 +106,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             nextCursor,
         });
     } catch (error) {
-        console.log('[DIRECT_MESSAGES_GET]', error);
+        console.log(ApiErrors.DIRECT_MESSAGES_GET_ERROR, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }

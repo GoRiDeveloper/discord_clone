@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 
-import { currentProfile, db } from '@/lib';
+import { getProfile, db } from '@/lib';
+import { ApiErrors, HTTP_CODE_ERRORS } from '@/models';
 
 /**
  * Patch invite code parameters.
@@ -19,21 +20,22 @@ interface ParamsPatch {
  * @returns { Promise<NextResponse> } Response when updating the server invitation code.
  */
 export async function PATCH(
-    req: NextRequest,
+    _req: NextRequest,
     { params }: ParamsPatch
 ): Promise<NextResponse> {
     try {
+        const { getServerProfile } = await getProfile();
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfile();
-
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
+        const profile = getServerProfile();
 
         // If there is no server id, it returns a response that there is no server id..
         if (!params.serverId)
-            return new NextResponse('Server ID Missing', { status: 400 });
+            return new NextResponse(ApiErrors.SERVER_ID_MISSING, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
+            });
 
         /**
          * Update the server in the database.
@@ -41,7 +43,7 @@ export async function PATCH(
         const server = await db.server.update({
             where: {
                 id: params.serverId,
-                profileId: profile.id,
+                profileId: (profile as any).id,
             },
             data: {
                 inviteCode: randomUUID(),
@@ -51,8 +53,10 @@ export async function PATCH(
         // Return the server with a new invitation code.
         return NextResponse.json(server);
     } catch (error) {
-        console.error('[SERVER_ID]', error);
+        console.error(ApiErrors.SERVER_ID, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }

@@ -1,5 +1,6 @@
 import type { FC, PropsWithChildren, JSX } from 'react';
-import { NavigationSidebar } from '@/components';
+
+import { NavigationSidebar } from './components';
 
 /**
  * Main design of the app.

@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MemberRole } from '@prisma/client';
 
-import { currentProfile, db } from '@/lib';
+import { getProfile, db } from '@/lib';
+import {
+    ApiErrors,
+    SearchParamsModel,
+    HTTP_CODE_ERRORS,
+    APP_CHANNELS,
+} from '@/models';
 
 /**
  * Function to add channel to server in database.
@@ -12,10 +18,12 @@ import { currentProfile, db } from '@/lib';
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
+        const { getServerProfile } = await getProfile();
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfile();
+        const profile = getServerProfile();
 
         // Get name and type channel form client.
         const { name, type } = await req.json();
@@ -26,19 +34,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         /**
          * Server id from the search parameters in the url.
          */
-        const serverId = searchParams.get('serverId');
+        const serverId = searchParams.get(SearchParamsModel.SERVER_ID);
 
         // If there is no server id, it returns a response that there is no server id.
         if (!serverId)
-            return new NextResponse('Server ID missing', { status: 400 });
-
-        // If there is no profile in session, return a non-authorization response.
-        if (!profile) return new NextResponse('Unauthorized', { status: 401 });
+            return new NextResponse(ApiErrors.SERVER_ID_MISSING, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
+            });
 
         // if the name is "general", we return an error since the name cannot be "general".
-        if (name === 'general')
-            return new NextResponse('Name cannot be "general"', {
-                status: 400,
+        if (name === APP_CHANNELS.GENERAL)
+            return new NextResponse(ApiErrors.NAME_NOT_GENERAL, {
+                status: HTTP_CODE_ERRORS.BAD_REQUEST,
             });
 
         /**
@@ -49,7 +56,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 id: serverId,
                 members: {
                     some: {
-                        profileId: profile.id,
+                        profileId: (profile as any).id,
                         role: {
                             in: [MemberRole.ADMIN, MemberRole.MODERATOR],
                         },
@@ -59,7 +66,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             data: {
                 channels: {
                     create: {
-                        profileId: profile.id,
+                        profileId: (profile as any).id,
                         name,
                         type,
                     },
@@ -70,8 +77,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         // Return the server with the channel added.
         return NextResponse.json(server);
     } catch (error) {
-        console.log('CHANNELS_POST', error);
+        console.error(ApiErrors.CHANNELS_POST_ERROR, error);
         // Return an error response if there is an error.
-        return new NextResponse('Internal Error', { status: 500 });
+        return new NextResponse(ApiErrors.INTERNAL_ERROR, {
+            status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
+        });
     }
 }

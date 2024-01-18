@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useMemo, useState } from 'react';
 
 /**
@@ -5,7 +7,7 @@ import { useCallback, useMemo, useState } from 'react';
  */
 export const useToggle = () => {
     // Generic boolean state.
-    const [status, setStatus] = useState<Boolean>(false);
+    const [status, setStatus] = useState<boolean>(false);
 
     /**
      * Function to handle generic state.

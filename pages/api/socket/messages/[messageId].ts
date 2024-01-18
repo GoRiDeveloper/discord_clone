@@ -1,8 +1,15 @@
 import { MemberRole } from '@prisma/client';
 import { NextApiRequest } from 'next';
 
-import { currentProfilePages, db } from '@/lib';
+import { getProfile, db } from '@/lib';
 import { NextApiResponseServerIo } from '@/types';
+import {
+    ApiErrors,
+    socketKeys,
+    HTTP_CODE,
+    HTTP_CODE_ERRORS,
+    HTTP_METHODS,
+} from '@/models';
 
 /**
  * Handler for updating a specific message.
@@ -17,15 +24,22 @@ export default async function handler(
     res: NextApiResponseServerIo
 ): Promise<void> {
     // If the method is different from DELETE or PATCH, respond that the method is not allowed.
-    if (req.method !== 'DELETE' && req.method !== 'PATCH') {
-        return res.status(405).json({ error: 'Method not allowed' });
+    if (
+        req.method !== HTTP_METHODS.DELETE &&
+        req.method !== HTTP_METHODS.PATCH
+    ) {
+        return res.status(HTTP_CODE_ERRORS.METHOD_NOT_ALLOWED).json({
+            error: ApiErrors.METHOD_NOT_ALLOWED,
+        });
     }
 
     try {
+        const { getPagesServerProfile } = await getProfile(req, res);
+
         /**
          * The current profile in session.
          */
-        const profile = await currentProfilePages(req);
+        const profile = getPagesServerProfile();
 
         /**
          * Destructuring the request query the server id, channel id and the message id.
@@ -37,19 +51,18 @@ export default async function handler(
          */
         const { content } = req.body;
 
-        // If there is no user logged in, we return an unauthorized error.
-        if (!profile) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
         // In case the message id does not exist, respond that the message id does not exist.
         if (!messageId) {
-            return res.status(400).json({ error: 'Message ID missing' });
+            return res.status(HTTP_CODE_ERRORS.BAD_REQUEST).json({
+                error: ApiErrors.MESSAGE_ID_MISSING,
+            });
         }
 
         // In case the channel does not exist, respond that the channel does not exist.
         if (!channelId) {
-            return res.status(404).json({ message: 'Channel ID missing' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.CHANNEL_ID_MISSING,
+            });
         }
 
         /**
@@ -60,7 +73,7 @@ export default async function handler(
                 id: serverId as string,
                 members: {
                     some: {
-                        profileId: profile.id,
+                        profileId: (profile as any).id,
                     },
                 },
             },
@@ -71,7 +84,9 @@ export default async function handler(
 
         // In case the server does not exist, respond that the server does not exist.
         if (!server) {
-            return res.status(404).json({ message: 'Server not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.SERVER_NOT_FOUND,
+            });
         }
 
         /**
@@ -86,19 +101,23 @@ export default async function handler(
 
         // In case the channel does not exist, respond that the channel does not exist.
         if (!channel) {
-            return res.status(404).json({ message: 'Channel not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.CHANNEL_NOT_FOUND,
+            });
         }
 
         /**
          * Constant where the member found based on an id is stored.
          */
         const member = server.members.find(
-            (member) => member.profileId === profile.id
+            (member) => member.profileId === (profile as any).id
         );
 
         // In case the member does not exist, respond that the member does not exist.
         if (!member) {
-            return res.status(404).json({ message: 'Member not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                message: ApiErrors.MEMBER_NOT_FOUND,
+            });
         }
 
         /**
@@ -120,7 +139,9 @@ export default async function handler(
 
         // If the message does not exist or has been deleted, return that it was not found.
         if (!message || message.deleted) {
-            return res.status(404).json({ error: 'Message not found' });
+            return res.status(HTTP_CODE_ERRORS.NOT_FOUND).json({
+                error: ApiErrors.MESSAGE_NOT_FOUND,
+            });
         }
 
         /**
@@ -145,11 +166,13 @@ export default async function handler(
 
         // If you cannot modify the message, we return an unauthorized response.
         if (!canModify) {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(HTTP_CODE_ERRORS.UNAUTHORIZED).json({
+                error: ApiErrors.UNAUTHORIZED,
+            });
         }
 
         // If the method is DELETE, update the message so that it is a deleted message.
-        if (req.method === 'DELETE') {
+        if (req.method === HTTP_METHODS.DELETE) {
             message = await db.message.update({
                 where: {
                     id: messageId as string,
@@ -170,15 +193,26 @@ export default async function handler(
         }
 
         // If the method is PATCH, update the message.
-        if (req.method === 'PATCH') {
+        if (req.method === HTTP_METHODS.PATCH) {
             // If the user not owner message.
             if (!isMessageOwner) {
-                return res.status(401).json({ message: 'Unauthorized' });
+                return res.status(HTTP_CODE_ERRORS.UNAUTHORIZED).json({
+                    message: ApiErrors.UNAUTHORIZED,
+                });
+            }
+
+            // If the message is the same as the message in the database, return an error.
+            if (message.content === content) {
+                return res.status(HTTP_CODE_ERRORS.BAD_REQUEST).json({
+                    message: ApiErrors.EQUAL_MESSAGE,
+                });
             }
 
             // In case the content does not exist, respond that the content does not exist.
             if (!content) {
-                return res.status(400).json({ error: 'Content missing' });
+                return res.status(HTTP_CODE_ERRORS.BAD_REQUEST).json({
+                    error: ApiErrors.CONTENT_MISSING,
+                });
             }
 
             // Update message in the database.
@@ -202,16 +236,18 @@ export default async function handler(
         /**
          * Message update key to socket.
          */
-        const updateKey = `chat:${channelId}:messages:update`;
+        const updateKey = socketKeys.UPDATE_KEY(channelId);
 
         // Update message in sockets.
         res?.socket?.server?.io?.emit(updateKey, message);
 
         // Return response with message updated.
-        return res.status(200).json(message);
+        return res.status(HTTP_CODE.SUCCESS).json(message);
     } catch (error) {
-        console.log('[MESSAGE_ID]', error);
+        console.error(ApiErrors.MESSAGE_ID, error);
         // Return an error response if there is an error.
-        return res.status(500).json({ error: 'Internal Error' });
+        return res.status(HTTP_CODE_ERRORS.INTERNAL_ERROR).json({
+            error: ApiErrors.INTERNAL_ERROR,
+        });
     }
 }

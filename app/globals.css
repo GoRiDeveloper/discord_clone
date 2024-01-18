@@ -80,3 +80,34 @@ body,
         @apply bg-background text-foreground;
     }
 }
+
+.lk-chat {
+    position: absolute;
+    width: 100% !important;
+    height: 89%;
+}
+
+.lk-control-bar {
+    overflow-x: hidden;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 443px) {
+    .lk-control-bar {
+        flex-wrap: nowrap;
+    }
+}
+
+@media (min-width: 767px) {
+    .lk-control-bar {
+        flex-wrap: wrap;
+    }
+}
+
+@media (min-width: 1034px) {
+    .lk-control-bar {
+        flex-wrap: nowrap;
+    }
+}
+
+@import '@uploadthing/react/styles.css';

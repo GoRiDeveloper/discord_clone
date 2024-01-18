@@ -1,16 +1,18 @@
-import { redirectToSignIn } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
-import type { FC, JSX, PropsWithChildren } from 'react';
+import { Suspense, type FC, type JSX, type PropsWithChildren } from 'react';
 
-import { ServerSidebar } from '@/components';
-import { currentProfile, db } from '@/lib';
+import { ServerIdParams } from '@/models';
+import ErrorBoundary from '@/components/error.boundary';
+import {
+    ServerSidebar,
+    ServerErrorSection,
+    ServerLoading,
+} from '../../../components';
+import { useServerId } from './hooks';
 
 /**
  * Model for server id component props.
  */
-interface ServerIdLayoutProps extends PropsWithChildren {
-    params: { serverId: string };
-}
+type ServerIdLayoutProps = ServerIdParams & PropsWithChildren;
 
 /**
  * Server id component.
@@ -23,38 +25,16 @@ const ServerIdLayout: FC<ServerIdLayoutProps> = async ({
     children,
     params,
 }: ServerIdLayoutProps): Promise<JSX.Element> => {
-    /**
-     * The current profile in session.
-     */
-    const profile = await currentProfile();
-
-    // If there is no profile in session, return a non-authorization response.
-    if (!profile)
-        return redirectToSignIn({
-            returnBackUrl: 'http://localhost:3000/',
-        });
-
-    /**
-     * Server found.
-     */
-    const server = await db.server.findUnique({
-        where: {
-            id: params.serverId,
-            members: {
-                some: {
-                    profileId: profile.id,
-                },
-            },
-        },
-    });
-
-    // If the server was not found, redirect to the main route.
-    if (!server) return redirect('/');
+    useServerId({ serverId: params.serverId });
 
     return (
         <div className="h-full">
             <div className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
-                <ServerSidebar serverId={params.serverId} />
+                <ErrorBoundary fallback={<ServerErrorSection />}>
+                    <Suspense fallback={<ServerLoading />}>
+                        <ServerSidebar serverId={params.serverId} />
+                    </Suspense>
+                </ErrorBoundary>
             </div>
             <main className="h-full md:pl-60">{children}</main>
         </div>
