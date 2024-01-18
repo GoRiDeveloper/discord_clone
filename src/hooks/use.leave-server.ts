@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { useToggle, useModal } from '@/hooks';
 import { AppRoutes, ApiRoutes } from '@/models';
 

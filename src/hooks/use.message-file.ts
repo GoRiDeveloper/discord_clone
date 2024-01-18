@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import { useForm } from 'react-hook-form';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { useModal } from '@/hooks';
 import {
     DefaultMessageFile,

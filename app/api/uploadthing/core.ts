@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs';
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
 
-import { ApiErrors } from "@/models";
+import { ApiErrors } from '@/models';
 
 const f = createUploadthing();
 

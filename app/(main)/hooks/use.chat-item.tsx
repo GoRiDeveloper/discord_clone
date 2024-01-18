@@ -7,7 +7,7 @@ import qs from 'query-string';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { ChatForm, ChatItemProps } from '../models';
 import { AppRoutes } from '@/models';
 import { chatItemSchema } from '../schemas';

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useInfiniteQuery } from '@tanstack/react-query';
 import qs from 'query-string';

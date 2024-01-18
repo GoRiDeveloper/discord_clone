@@ -25,7 +25,7 @@ export interface ServerSearchProps {
  */
 export interface ServerHeaderOptionsProps extends ModalTypeProps {
     Icon: LucideIcon;
-    server: Server;
+    server: Server | ServerWithChannels | null;
     title: string;
     addClass?: string;
 }

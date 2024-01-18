@@ -2,7 +2,7 @@ import qs from 'query-string';
 import { useRouter } from 'next/navigation';
 import { MemberRole } from '@prisma/client';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { ApiRoutes, ModalType, type LoadingProps } from '@/models';
 import { useModal } from '@/hooks';
 

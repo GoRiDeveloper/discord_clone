@@ -7,7 +7,7 @@ import qs from 'query-string';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { useModal } from '@/hooks';
 import {
     ApiRoutes,

@@ -2,7 +2,7 @@ import { UserButton } from '@clerk/nextjs';
 import type { FC, JSX } from 'react';
 
 import { ModeToggle } from '../';
-import { AppRoutes } from "@/models";
+import { AppRoutes } from '@/models';
 
 /**
  * Nav configuration buttons component.

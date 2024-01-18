@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import type { FC } from 'react';
-import { redirectToSignIn } from "@clerk/nextjs";
+import { redirectToSignIn } from '@clerk/nextjs';
 
 import { db, getProfile } from '@/lib';
 import { redirectToSpecificServer } from '@/lib/server';

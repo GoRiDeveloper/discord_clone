@@ -33,9 +33,7 @@ export const ServerSidebar: FC<ServerIdProps> = async ({
         >
             <ServerHeader server={server} userRole={serverInfo.userRole} />
             <ScrollArea className="flex-1 px-3">
-                <ServerSearch
-                    data={serverInfo.serverData}
-                />
+                <ServerSearch data={serverInfo.serverData} />
                 <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
                 <ServerTextChannels
                     channels={serverInfo?.textChannels}

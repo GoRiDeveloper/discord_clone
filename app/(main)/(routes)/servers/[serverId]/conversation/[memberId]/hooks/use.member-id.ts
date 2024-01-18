@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { redirectToSignIn } from "@clerk/nextjs";
+import { redirectToSignIn } from '@clerk/nextjs';
 
 import { db, getProfile, getOrCreateConversation } from '@/lib';
 import { APP_CHANNELS, BASE_URL, AppRoutes } from '@/models';

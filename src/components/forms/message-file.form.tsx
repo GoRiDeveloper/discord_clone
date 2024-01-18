@@ -12,7 +12,7 @@ import { useMessageFile } from '@/hooks';
 
 /**
  * Message file form component.
- * 
+ *
  * @returns { JSX.Element } Message file form component.
  */
 export const MessageFileForm: FC = (): JSX.Element => {

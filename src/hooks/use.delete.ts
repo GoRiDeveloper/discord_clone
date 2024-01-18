@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { useModal, useToggle } from '@/hooks';
 import {
     ApiRoutes,

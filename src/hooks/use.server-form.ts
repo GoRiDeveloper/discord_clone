@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 
-import { Axios } from "@/lib";
+import { Axios } from '@/lib';
 import { useModal } from '@/hooks';
 import {
     ApiRoutes,
