@@ -8,8 +8,6 @@ console.log(BASE_URL);
  *
  * @returns { JSX.Element } User Registration Modal Component.
  */
-const SignInPage: FC = (): JSX.Element => (
-    <SignIn redirectUrl={BASE_URL} afterSignInUrl={BASE_URL} />
-);
+const SignInPage: FC = (): JSX.Element => <SignIn afterSignInUrl={BASE_URL} />;
 
 export default SignInPage;
