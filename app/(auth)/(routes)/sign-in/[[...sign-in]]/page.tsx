@@ -8,6 +8,6 @@ import { BASE_URL } from '@/models';
  *
  * @returns { JSX.Element } User Registration Modal Component.
  */
-const SignInPage: FC = (): JSX.Element => <SignIn redirectUrl={BASE_URL} />;
+const SignInPage: FC = (): JSX.Element => <SignIn afterSignInUrl={BASE_URL} />;
 
 export default SignInPage;
