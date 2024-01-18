@@ -11,7 +11,7 @@ const DEV_BASE_URL = `http://localhost:${PORT}/`;
 /**
  * Base URL.
  */
-export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || DEV_BASE_URL;
+export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? DEV_BASE_URL;
 
 /**
  * App errors.
