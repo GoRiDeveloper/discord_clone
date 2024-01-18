@@ -31,8 +31,10 @@ const ioHandler = (
             addTrailingSlash: false,
             cors: {
                 origin: '*',
-                methods: '*',
+                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+                credentials: true,
             },
+            connectTimeout: 10000,
         });
 
         res.socket.server.io = io;
