@@ -29,13 +29,6 @@ const ioHandler = (
         const io = new ServerIO(httpServer, {
             path: SocketApiRoutes.IO,
             addTrailingSlash: false,
-            cors: {
-                origin: [
-                    'https://g-discord-clone.vercel.app/',
-                    'http://localhost:3000/',
-                ],
-                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-            },
         });
 
         res.socket.server.io = io;
