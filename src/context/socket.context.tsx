@@ -67,6 +67,7 @@ export const SocketContextProvider: FC<PropsWithChildren> = ({
         );
 
         SocketInstance.on('connect_error', (err: any) => {
+            console.log({ err });
             console.error('Client side error due to: ' + err.message);
         });
 
