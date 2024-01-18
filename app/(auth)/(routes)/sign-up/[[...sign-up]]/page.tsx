@@ -8,6 +8,10 @@ import { BASE_URL } from '@/models';
  *
  * @returns { JSX.Element } User Authentication Modal Component.
  */
-const SignUpPage: FC = (): JSX.Element => <SignUp afterSignUpUrl={BASE_URL} />;
+const SignUpPage: FC = (): JSX.Element => {
+    console.log({ BASE_URL });
+
+    return <SignUp afterSignUpUrl={BASE_URL} />;
+};
 
 export default SignUpPage;
