@@ -29,6 +29,7 @@ const ioHandler = (
         const io = new ServerIO(httpServer, {
             path: SocketApiRoutes.IO,
             addTrailingSlash: false,
+            transports: ['polling'],
         });
 
         res.socket.server.io = io;
