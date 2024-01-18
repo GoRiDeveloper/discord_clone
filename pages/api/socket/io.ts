@@ -29,10 +29,6 @@ const ioHandler = (
         const io = new ServerIO(httpServer, {
             path: SocketApiRoutes.IO,
             addTrailingSlash: false,
-            cors: {
-                origin: '*',
-                methods: '*',
-            },
         });
 
         res.socket.server.io = io;

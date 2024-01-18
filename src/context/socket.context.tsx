@@ -62,7 +62,6 @@ export const SocketContextProvider: FC<PropsWithChildren> = ({
             {
                 path: SocketApiRoutes.IO,
                 addTrailingSlash: false,
-                transports: ['websocket'],
             }
         );
 
