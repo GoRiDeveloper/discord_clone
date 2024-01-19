@@ -42,6 +42,7 @@ export const getProfile = async (
      * Function to obtain the information of the authenticated user in the server.
      */
     const getServerProfile = () => {
+        console.log({ profile });
         // If there is no profile in session, return a non-authorization response.
         if (!profile)
             return new NextResponse(ApiErrors.UNAUTHORIZED, {
