@@ -38,6 +38,7 @@ const ioHandler = (
                 credentials: true,
             },
             connectTimeout: 10000,
+            transports: ['websocket'],
         });
 
         res.socket.server.io = io;
