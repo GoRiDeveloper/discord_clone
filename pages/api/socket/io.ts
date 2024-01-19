@@ -34,7 +34,7 @@ const ioHandler = (
                     'https://g-iscord.vercel.app/',
                     'http://localhost:3000/',
                 ],
-                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'],
                 credentials: true,
             },
             connectTimeout: 10000,
