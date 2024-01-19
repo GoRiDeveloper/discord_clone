@@ -35,7 +35,6 @@ const ioHandler = (
                     'http://localhost:3000/',
                 ],
                 methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'],
-                credentials: true,
             },
         });
 

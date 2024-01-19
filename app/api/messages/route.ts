@@ -104,7 +104,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             nextCursor,
         });
     } catch (error) {
-        console.log(ApiErrors.MESSAGES_GET, error);
+        console.error(ApiErrors.MESSAGES_GET, error);
         // Return an error response if there is an error.
         return new NextResponse(ApiErrors.INTERNAL_ERROR, {
             status: HTTP_CODE_ERRORS.INTERNAL_ERROR,

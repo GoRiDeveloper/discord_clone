@@ -94,7 +94,7 @@ export async function PATCH(
         // Return the server with the channel deleted.
         return NextResponse.json(server);
     } catch (error) {
-        console.log(ApiErrors.CHANNEL_ID_PATCH_ERROR, error);
+        console.error(ApiErrors.CHANNEL_ID_PATCH_ERROR, error);
         // Return an error response if there is an error.
         return new NextResponse(ApiErrors.INTERNAL_ERROR, {
             status: HTTP_CODE_ERRORS.INTERNAL_ERROR,
@@ -165,7 +165,7 @@ export async function DELETE(
         // Return the server with the channel deleted.
         return NextResponse.json(server);
     } catch (error) {
-        console.log(ApiErrors.CHANNEL_ID_DELETE_ERROR, error);
+        console.error(ApiErrors.CHANNEL_ID_DELETE_ERROR, error);
         // Return an error response if there is an error.
         return new NextResponse(ApiErrors.INTERNAL_ERROR, {
             status: HTTP_CODE_ERRORS.INTERNAL_ERROR,

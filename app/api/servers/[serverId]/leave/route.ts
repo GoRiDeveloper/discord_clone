@@ -65,7 +65,7 @@ export async function PATCH(
         // Return the server without the user who left the server.
         return NextResponse.json(server);
     } catch (error) {
-        console.log(ApiErrors.SERVER_ID_LEAVE, error);
+        console.error(ApiErrors.SERVER_ID_LEAVE, error);
         // Return an error response if there is an error.
         return new NextResponse(ApiErrors.INTERNAL_ERROR, {
             status: HTTP_CODE_ERRORS.INTERNAL_ERROR,

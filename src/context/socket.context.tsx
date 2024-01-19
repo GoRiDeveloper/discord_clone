@@ -62,13 +62,12 @@ export const SocketContextProvider: FC<PropsWithChildren> = ({
             {
                 path: SocketApiRoutes.IO,
                 addTrailingSlash: false,
-                withCredentials: true,
             }
         );
 
         SocketInstance.on('connect_error', (err: any) => {
-            console.log({ err });
-            console.error('Client side error due to: ' + err.message);
+            // console.log({ err });
+            // console.error('Client side error due to: ' + err.message);
         });
 
         // If the socket is connected, we change the connection state.

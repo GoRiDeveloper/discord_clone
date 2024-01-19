@@ -244,7 +244,7 @@ export default async function handler(
         // Return response with message updated.
         return res.status(HTTP_CODE.SUCCESS).json(directMessage);
     } catch (error) {
-        console.log(ApiErrors.DIRECT_MESSAGE_ID, error);
+        console.error(ApiErrors.DIRECT_MESSAGE_ID, error);
         // Return an error response if there is an error.
         return res.status(HTTP_CODE_ERRORS.INTERNAL_ERROR).json({
             error: ApiErrors.INTERNAL_ERROR,

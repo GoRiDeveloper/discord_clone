@@ -146,7 +146,7 @@ export default async function handler(
         // Respond with the message in case everything has gone correctly.
         return res.status(HTTP_CODE.SUCCESS).json(message);
     } catch (error) {
-        console.log(ApiErrors.DIRECT_MESSAGES_POST, error);
+        console.error(ApiErrors.DIRECT_MESSAGES_POST, error);
         // Return an error response if there is an error.
         return res.status(HTTP_CODE_ERRORS.INTERNAL_ERROR).json({
             message: ApiErrors.INTERNAL_ERROR,
