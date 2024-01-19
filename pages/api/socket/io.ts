@@ -30,7 +30,10 @@ const ioHandler = (
             path: SocketApiRoutes.IO,
             addTrailingSlash: false,
             cors: {
-                origin: '*',
+                origin: [
+                    'https://g-iscord.vercel.app/',
+                    'http://localhost:3000/',
+                ],
                 methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
                 credentials: true,
             },
