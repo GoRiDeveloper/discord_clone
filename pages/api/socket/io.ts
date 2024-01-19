@@ -37,8 +37,6 @@ const ioHandler = (
                 methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'],
                 credentials: true,
             },
-            connectTimeout: 10000,
-            transports: ['websocket'],
         });
 
         res.socket.server.io = io;
