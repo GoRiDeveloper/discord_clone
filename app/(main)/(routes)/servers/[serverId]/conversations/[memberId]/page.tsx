@@ -1,13 +1,13 @@
 import type { FC, JSX } from 'react';
 
-import {
-    ChatType,
-    ParamKeyModel,
-    MessagesApiRoutes,
-} from '../../../../../models';
 import { MediaRoom } from '../../../../../components';
 import { ChatHeader, ChatMessages } from '../../../../../components/chat';
 import { ChatInput } from '../../../../../components/chat/chat.input';
+import {
+    ChatType,
+    MessagesApiRoutes,
+    ParamKeyModel,
+} from '../../../../../models';
 import { useMemberId } from './hooks';
 
 /**
@@ -41,7 +41,7 @@ const MemberIdPage: FC<MemberIdPageProps> = async ({
         });
 
     return (
-        <div className="bg-white dark:bg-[#313338] flex flex-col-h-full">
+        <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
             <ChatHeader
                 serverId={serverId}
                 name={otherMember.profile.name}
